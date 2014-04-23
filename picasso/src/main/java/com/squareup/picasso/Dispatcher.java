@@ -52,9 +52,10 @@ class Dispatcher {
   static final int HUNTER_RETRY = 5;
   static final int HUNTER_DECODE_FAILED = 6;
   static final int HUNTER_DELAY_NEXT_BATCH = 7;
-  static final int HUNTER_BATCH_COMPLETE = 8;
+  static final int HUNTER_BATCH_COMPLETE = 8; // using batch
   static final int NETWORK_STATE_CHANGE = 9;
   static final int AIRPLANE_MODE_CHANGE = 10;
+  static final int REQUEST_COMPLETE = 11;	// single, not using batch
 
   private static final String DISPATCHER_THREAD_NAME = "Dispatcher";
   private static final int BATCH_DELAY = 200; // ms
@@ -73,6 +74,7 @@ class Dispatcher {
 
   NetworkInfo networkInfo;
   boolean airplaneMode;
+  boolean useBatch;
 
   Dispatcher(Context context, ExecutorService service, Handler mainThreadHandler,
       Downloader downloader, Cache cache, Stats stats) {
@@ -90,6 +92,10 @@ class Dispatcher {
     this.airplaneMode = Utils.isAirplaneModeOn(this.context);
     this.receiver = new NetworkBroadcastReceiver(this);
     receiver.register();
+  }
+
+  void setUseBatch(boolean value) {
+    this.useBatch = value;
   }
 
   void shutdown() {
@@ -207,9 +213,13 @@ class Dispatcher {
     if (hunter.isCancelled()) {
       return;
     }
-    batch.add(hunter);
-    if (!handler.hasMessages(HUNTER_DELAY_NEXT_BATCH)) {
-      handler.sendEmptyMessageDelayed(HUNTER_DELAY_NEXT_BATCH, BATCH_DELAY);
+    if (useBatch) {
+      batch.add(hunter);
+      if (!handler.hasMessages(HUNTER_DELAY_NEXT_BATCH)) {
+        handler.sendEmptyMessageDelayed(HUNTER_DELAY_NEXT_BATCH, BATCH_DELAY);
+      }
+    } else {
+      mainThreadHandler.sendMessage(mainThreadHandler.obtainMessage(REQUEST_COMPLETE, hunter));
     }
   }
 

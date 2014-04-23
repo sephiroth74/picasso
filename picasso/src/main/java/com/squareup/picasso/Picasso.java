@@ -34,6 +34,7 @@ import java.util.concurrent.ExecutorService;
 import static android.os.Process.THREAD_PRIORITY_BACKGROUND;
 import static com.squareup.picasso.Action.RequestWeakReference;
 import static com.squareup.picasso.Dispatcher.HUNTER_BATCH_COMPLETE;
+import static com.squareup.picasso.Dispatcher.REQUEST_COMPLETE;
 import static com.squareup.picasso.Dispatcher.REQUEST_GCED;
 import static com.squareup.picasso.Utils.THREAD_PREFIX;
 import static com.squareup.picasso.Utils.checkMain;
@@ -101,6 +102,11 @@ public class Picasso {
         case REQUEST_GCED: {
           Action action = (Action) msg.obj;
           action.picasso.cancelExistingRequest(action.getTarget());
+          break;
+        }
+        case REQUEST_COMPLETE: {
+          BitmapHunter hunter = (BitmapHunter) msg.obj;
+          hunter.picasso.complete(hunter);
           break;
         }
         default:
@@ -261,6 +267,10 @@ public class Picasso {
     return stats.createSnapshot();
   }
 
+  public void clearCache() {
+    cache.clear();
+  }
+
   public Cache getCache() {
     return cache;
   }
@@ -313,7 +323,7 @@ public class Picasso {
     dispatcher.dispatchSubmit(action, delayMillis);
   }
 
-  Bitmap quickMemoryCacheCheck(String key) {
+  Bitmap quickMemoryCacheCheck(Cache cache, String key) {
     Bitmap cached = cache.get(key);
     if (cached != null) {
       stats.dispatchCacheHit();
@@ -386,6 +396,15 @@ public class Picasso {
         deferredRequestCreator.cancel();
       }
     }
+  }
+
+  /**
+   * Toggle the batch mode for delivering results.
+   * Setting to true can cause lag in the UI.
+   * @param useBatch toggle on/off batch delivering
+   */
+  public void setUseBatch(boolean useBatch) {
+    this.dispatcher.setUseBatch(useBatch);
   }
 
   private static class CleanupThread extends Thread {

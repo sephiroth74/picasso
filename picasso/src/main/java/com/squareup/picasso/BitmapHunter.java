@@ -45,7 +45,7 @@ abstract class BitmapHunter implements Runnable {
    * this will only ever happen in background threads we help avoid excessive memory thrashing as
    * well as potential OOMs. Shamelessly stolen from Volley.
    */
-  private static final Object DECODE_LOCK = new Object();
+  static final Object DECODE_LOCK = new Object();
 
   private static final ThreadLocal<StringBuilder> NAME_BUILDER = new ThreadLocal<StringBuilder>() {
     @Override protected StringBuilder initialValue() {

@@ -36,8 +36,10 @@ class FileBitmapHunter extends ContentStreamBitmapHunter {
 
   @Override Bitmap decode(Request data)
       throws IOException {
-    setExifRotation(getFileExifRotation(data.uri));
-    return super.decode(data);
+    synchronized (DECODE_LOCK) {
+      setExifRotation(getFileExifRotation(data.uri));
+      return super.decode(data);
+    }
   }
 
   static int getFileExifRotation(Uri uri) throws IOException {

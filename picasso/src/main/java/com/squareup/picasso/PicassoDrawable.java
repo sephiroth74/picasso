@@ -58,7 +58,7 @@ final class PicassoDrawable extends BitmapDrawable {
   static void setPlaceholder(ImageView target, int placeholderResId, Drawable placeholderDrawable) {
     if (placeholderResId != 0) {
       target.setImageResource(placeholderResId);
-    } else {
+    } else if (null != placeholderDrawable) {
       target.setImageDrawable(placeholderDrawable);
     }
     if (target.getDrawable() instanceof AnimationDrawable) {

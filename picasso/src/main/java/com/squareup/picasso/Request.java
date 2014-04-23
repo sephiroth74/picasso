@@ -72,11 +72,13 @@ public final class Request {
   public final Bitmap.Config config;
   /** custom generator */
   public final Generator generator;
+  /** cache to be used */
+  public final Cache cache;
 
   private Request(Uri uri, int resourceId, List<Transformation> transformations, int targetWidth,
       int targetHeight, boolean resizeOnlyIfBigger, boolean centerCrop, boolean centerInside,
       float rotationDegrees, float rotationPivotX, float rotationPivotY, boolean hasRotationPivot,
-      Bitmap.Config config, Generator generator) {
+      Bitmap.Config config, Generator generator, Cache cache) {
     this.uri = uri;
     this.resourceId = resourceId;
     if (transformations == null) {
@@ -95,6 +97,7 @@ public final class Request {
     this.resizeOnlyIfBigger = resizeOnlyIfBigger;
     this.config = config;
     this.generator = generator;
+    this.cache = cache;
   }
 
   String getName() {
@@ -144,6 +147,7 @@ public final class Request {
     private Bitmap.Config config;
     private boolean resizeOnlyIfBigger;
     private Generator generator;
+    private Cache cache;
 
     /** Start building a request using the specified {@link Uri}. */
     public Builder(Uri uri) {
@@ -176,6 +180,7 @@ public final class Request {
         transformations = new ArrayList<Transformation>(request.transformations);
       }
       config = request.config;
+      cache = request.cache;
     }
 
     boolean hasImage() {
@@ -314,6 +319,15 @@ public final class Request {
       return this;
     }
 
+    public Builder setCache(Cache cache) {
+      this.cache = cache;
+      return this;
+    }
+
+    public Cache getCache() {
+      return this.cache;
+    }
+
     /**
      * Add a custom transformation to be applied to the image.
      * <p>
@@ -343,7 +357,7 @@ public final class Request {
       }
       return new Request(uri, resourceId, transformations, targetWidth, targetHeight,
           resizeOnlyIfBigger, centerCrop, centerInside, rotationDegrees, rotationPivotX,
-          rotationPivotY, hasRotationPivot, config, generator);
+          rotationPivotY, hasRotationPivot, config, generator, cache);
     }
   }
 }
