@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.squareup.picasso;
+package it.sephiroth.android.library.picasso;
 
 import android.R;
 import android.graphics.Bitmap;
@@ -34,20 +34,20 @@ import org.robolectric.annotation.Config;
 import java.io.IOException;
 import java.util.concurrent.CountDownLatch;
 
-import static com.squareup.picasso.Picasso.LoadedFrom.MEMORY;
-import static com.squareup.picasso.Picasso.RequestTransformer.IDENTITY;
-import static com.squareup.picasso.RemoteViewsAction.AppWidgetAction;
-import static com.squareup.picasso.RemoteViewsAction.NotificationAction;
-import static com.squareup.picasso.TestUtils.BITMAP_1;
-import static com.squareup.picasso.TestUtils.TRANSFORM_REQUEST_ANSWER;
-import static com.squareup.picasso.TestUtils.URI_1;
-import static com.squareup.picasso.TestUtils.URI_KEY_1;
-import static com.squareup.picasso.TestUtils.mockCallback;
-import static com.squareup.picasso.TestUtils.mockFitImageViewTarget;
-import static com.squareup.picasso.TestUtils.mockImageViewTarget;
-import static com.squareup.picasso.TestUtils.mockNotification;
-import static com.squareup.picasso.TestUtils.mockRemoteViews;
-import static com.squareup.picasso.TestUtils.mockTarget;
+import static it.sephiroth.android.library.picasso.Picasso.LoadedFrom.MEMORY;
+import static it.sephiroth.android.library.picasso.Picasso.RequestTransformer.IDENTITY;
+import static it.sephiroth.android.library.picasso.RemoteViewsAction.AppWidgetAction;
+import static it.sephiroth.android.library.picasso.RemoteViewsAction.NotificationAction;
+import static it.sephiroth.android.library.picasso.TestUtils.BITMAP_1;
+import static it.sephiroth.android.library.picasso.TestUtils.TRANSFORM_REQUEST_ANSWER;
+import static it.sephiroth.android.library.picasso.TestUtils.URI_1;
+import static it.sephiroth.android.library.picasso.TestUtils.URI_KEY_1;
+import static it.sephiroth.android.library.picasso.TestUtils.mockCallback;
+import static it.sephiroth.android.library.picasso.TestUtils.mockFitImageViewTarget;
+import static it.sephiroth.android.library.picasso.TestUtils.mockImageViewTarget;
+import static it.sephiroth.android.library.picasso.TestUtils.mockNotification;
+import static it.sephiroth.android.library.picasso.TestUtils.mockRemoteViews;
+import static it.sephiroth.android.library.picasso.TestUtils.mockTarget;
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.fest.assertions.api.Assertions.fail;
 import static org.mockito.Matchers.any;

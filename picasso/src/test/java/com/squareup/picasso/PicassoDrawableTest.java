@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.squareup.picasso;
+package it.sephiroth.android.library.picasso;
 
 import android.content.Context;
 import android.graphics.drawable.ColorDrawable;
@@ -25,10 +25,10 @@ import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
 import static android.graphics.Color.RED;
-import static com.squareup.picasso.Picasso.LoadedFrom.DISK;
-import static com.squareup.picasso.Picasso.LoadedFrom.MEMORY;
-import static com.squareup.picasso.TestUtils.BITMAP_1;
-import static com.squareup.picasso.Utils.FADE_TIME;
+import static it.sephiroth.android.library.picasso.Picasso.LoadedFrom.DISK;
+import static it.sephiroth.android.library.picasso.Picasso.LoadedFrom.MEMORY;
+import static it.sephiroth.android.library.picasso.TestUtils.BITMAP_1;
+import static it.sephiroth.android.library.picasso.Utils.FADE_TIME;
 import static org.fest.assertions.api.Assertions.assertThat;
 
 @RunWith(RobolectricTestRunner.class)

@@ -16,7 +16,7 @@ Download [the latest JAR][2] or grab via Maven:
 
 ```xml
 <dependency>
-    <groupId>com.squareup.picasso</groupId>
+    <groupId>it.sephiroth.android.library.picasso</groupId>
     <artifactId>picasso</artifactId>
     <version>(insert latest version)</version>
 </dependency>
@@ -53,4 +53,4 @@ License
 
 
  [1]: http://square.github.io/picasso/
- [2]: http://repository.sonatype.org/service/local/artifact/maven/redirect?r=central-proxy&g=com.squareup.picasso&a=picasso&v=LATEST
+ [2]: http://repository.sonatype.org/service/local/artifact/maven/redirect?r=central-proxy&g=it.sephiroth.android.library.picasso&a=picasso&v=LATEST

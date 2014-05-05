@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.squareup.picasso;
+package it.sephiroth.android.library.picasso;
 
 import android.view.ViewTreeObserver;
 import android.widget.ImageView;
@@ -25,10 +25,10 @@ import org.mockito.Captor;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
-import static com.squareup.picasso.TestUtils.TRANSFORM_REQUEST_ANSWER;
-import static com.squareup.picasso.TestUtils.URI_1;
-import static com.squareup.picasso.TestUtils.mockCallback;
-import static com.squareup.picasso.TestUtils.mockFitImageViewTarget;
+import static it.sephiroth.android.library.picasso.TestUtils.TRANSFORM_REQUEST_ANSWER;
+import static it.sephiroth.android.library.picasso.TestUtils.URI_1;
+import static it.sephiroth.android.library.picasso.TestUtils.mockCallback;
+import static it.sephiroth.android.library.picasso.TestUtils.mockFitImageViewTarget;
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;

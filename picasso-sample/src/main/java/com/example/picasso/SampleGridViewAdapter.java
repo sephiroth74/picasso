@@ -1,13 +1,18 @@
 package com.example.picasso;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import com.squareup.picasso.Picasso;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import it.sephiroth.android.library.picasso.Callback;
+import it.sephiroth.android.library.picasso.Picasso;
 
 import static android.widget.ImageView.ScaleType.CENTER_CROP;
 
@@ -26,6 +31,9 @@ final class SampleGridViewAdapter extends BaseAdapter {
     ArrayList<String> copy = new ArrayList<String>(urls);
     urls.addAll(copy);
     urls.addAll(copy);
+
+    Picasso.with(context).setIndicatorsEnabled(true);
+    Picasso.with(context).setUseBatch(false);
   }
 
   @Override public View getView(int position, View convertView, ViewGroup parent) {
@@ -35,16 +43,31 @@ final class SampleGridViewAdapter extends BaseAdapter {
       view.setScaleType(CENTER_CROP);
     }
 
+    view.setImageBitmap(null);
+
     // Get the image URL for the current position.
     String url = getItem(position);
+
+    Picasso.with(context).cancelRequest(view);
 
     // Trigger the download of the URL asynchronously into the image view.
     Picasso.with(context) //
         .load(url) //
-        .placeholder(R.drawable.placeholder) //
-        .error(R.drawable.error) //
+//        .placeholder(R.drawable.placeholder) //
+//        .error(R.drawable.error) //
         .fit() //
-        .into(view);
+        .config(Bitmap.Config.RGB_565)
+        .into(view, new Callback() {
+          @Override
+          public void onSuccess() {
+
+          }
+
+          @Override
+          public void onError() {
+            Log.e("adapter", "onError");
+          }
+        });
 
     return view;
   }

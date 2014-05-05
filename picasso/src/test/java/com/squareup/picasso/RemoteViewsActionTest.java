@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.squareup.picasso;
+package it.sephiroth.android.library.picasso;
 
 import android.R;
 import android.widget.RemoteViews;
@@ -24,11 +24,11 @@ import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
-import static com.squareup.picasso.Picasso.LoadedFrom.NETWORK;
-import static com.squareup.picasso.Picasso.RequestTransformer.IDENTITY;
-import static com.squareup.picasso.Utils.FADE_TIME;
-import static com.squareup.picasso.TestUtils.BITMAP_1;
-import static com.squareup.picasso.TestUtils.URI_KEY_1;
+import static it.sephiroth.android.library.picasso.Picasso.LoadedFrom.NETWORK;
+import static it.sephiroth.android.library.picasso.Picasso.RequestTransformer.IDENTITY;
+import static it.sephiroth.android.library.picasso.Utils.FADE_TIME;
+import static it.sephiroth.android.library.picasso.TestUtils.BITMAP_1;
+import static it.sephiroth.android.library.picasso.TestUtils.URI_KEY_1;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;

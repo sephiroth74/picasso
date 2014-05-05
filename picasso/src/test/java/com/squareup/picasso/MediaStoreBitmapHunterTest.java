@@ -1,4 +1,4 @@
-package com.squareup.picasso;
+package it.sephiroth.android.library.picasso;
 
 import android.content.ContentResolver;
 import android.content.Context;
@@ -11,15 +11,15 @@ import org.mockito.Mock;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
-import static com.squareup.picasso.MediaStoreBitmapHunter.PicassoKind.FULL;
-import static com.squareup.picasso.MediaStoreBitmapHunter.PicassoKind.MICRO;
-import static com.squareup.picasso.MediaStoreBitmapHunter.PicassoKind.MINI;
-import static com.squareup.picasso.MediaStoreBitmapHunter.getPicassoKind;
-import static com.squareup.picasso.TestUtils.IMAGE_THUMBNAIL_1;
-import static com.squareup.picasso.TestUtils.MEDIA_STORE_CONTENT_1_URL;
-import static com.squareup.picasso.TestUtils.MEDIA_STORE_CONTENT_KEY_1;
-import static com.squareup.picasso.TestUtils.VIDEO_THUMBNAIL_1;
-import static com.squareup.picasso.TestUtils.mockAction;
+import static it.sephiroth.android.library.picasso.MediaStoreBitmapHunter.PicassoKind.FULL;
+import static it.sephiroth.android.library.picasso.MediaStoreBitmapHunter.PicassoKind.MICRO;
+import static it.sephiroth.android.library.picasso.MediaStoreBitmapHunter.PicassoKind.MINI;
+import static it.sephiroth.android.library.picasso.MediaStoreBitmapHunter.getPicassoKind;
+import static it.sephiroth.android.library.picasso.TestUtils.IMAGE_THUMBNAIL_1;
+import static it.sephiroth.android.library.picasso.TestUtils.MEDIA_STORE_CONTENT_1_URL;
+import static it.sephiroth.android.library.picasso.TestUtils.MEDIA_STORE_CONTENT_KEY_1;
+import static it.sephiroth.android.library.picasso.TestUtils.VIDEO_THUMBNAIL_1;
+import static it.sephiroth.android.library.picasso.TestUtils.mockAction;
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;

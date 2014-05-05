@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.squareup.picasso;
+package it.sephiroth.android.library.picasso;
 
 import android.app.Activity;
 import android.net.Uri;
@@ -30,8 +30,8 @@ import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
-import static com.squareup.picasso.OkHttpDownloader.RESPONSE_SOURCE_ANDROID;
-import static com.squareup.picasso.OkHttpDownloader.RESPONSE_SOURCE_OKHTTP;
+import static it.sephiroth.android.library.picasso.OkHttpDownloader.RESPONSE_SOURCE_ANDROID;
+import static it.sephiroth.android.library.picasso.OkHttpDownloader.RESPONSE_SOURCE_OKHTTP;
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 

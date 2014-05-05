@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.squareup.picasso;
+package it.sephiroth.android.library.picasso;
 
 import android.content.Context;
 import android.content.res.Resources;
@@ -24,14 +24,14 @@ import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
-import static com.squareup.picasso.Picasso.LoadedFrom.MEMORY;
-import static com.squareup.picasso.Picasso.RequestTransformer.IDENTITY;
-import static com.squareup.picasso.Utils.FADE_TIME;
-import static com.squareup.picasso.TestUtils.BITMAP_1;
-import static com.squareup.picasso.TestUtils.BITMAP_3;
-import static com.squareup.picasso.TestUtils.RESOURCE_ID_1;
-import static com.squareup.picasso.TestUtils.URI_KEY_1;
-import static com.squareup.picasso.TestUtils.mockTarget;
+import static it.sephiroth.android.library.picasso.Picasso.LoadedFrom.MEMORY;
+import static it.sephiroth.android.library.picasso.Picasso.RequestTransformer.IDENTITY;
+import static it.sephiroth.android.library.picasso.Utils.FADE_TIME;
+import static it.sephiroth.android.library.picasso.TestUtils.BITMAP_1;
+import static it.sephiroth.android.library.picasso.TestUtils.BITMAP_3;
+import static it.sephiroth.android.library.picasso.TestUtils.RESOURCE_ID_1;
+import static it.sephiroth.android.library.picasso.TestUtils.URI_KEY_1;
+import static it.sephiroth.android.library.picasso.TestUtils.mockTarget;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;

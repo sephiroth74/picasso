@@ -1,11 +1,11 @@
-package com.squareup.picasso.pollexor;
+package it.sephiroth.android.library.picasso.pollexor;
 
 import android.net.Uri;
-import com.squareup.picasso.Request;
+import it.sephiroth.android.library.picasso.Request;
 import com.squareup.pollexor.Thumbor;
 import com.squareup.pollexor.ThumborUrlBuilder;
 
-import static com.squareup.picasso.Picasso.RequestTransformer;
+import static it.sephiroth.android.library.picasso.Picasso.RequestTransformer;
 
 /**
  * A {@link RequestTransformer} that changes requests to use {@link Thumbor} for some remote

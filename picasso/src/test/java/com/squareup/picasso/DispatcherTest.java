@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.squareup.picasso;
+package it.sephiroth.android.library.picasso;
 
 import android.content.Context;
 import android.content.Intent;
@@ -32,16 +32,16 @@ import java.util.concurrent.ExecutorService;
 import static android.content.Context.CONNECTIVITY_SERVICE;
 import static android.content.Intent.ACTION_AIRPLANE_MODE_CHANGED;
 import static android.net.ConnectivityManager.CONNECTIVITY_ACTION;
-import static com.squareup.picasso.Dispatcher.NetworkBroadcastReceiver;
-import static com.squareup.picasso.Dispatcher.NetworkBroadcastReceiver.EXTRA_AIRPLANE_STATE;
-import static com.squareup.picasso.TestUtils.BITMAP_1;
-import static com.squareup.picasso.TestUtils.BITMAP_2;
-import static com.squareup.picasso.TestUtils.URI_1;
-import static com.squareup.picasso.TestUtils.URI_2;
-import static com.squareup.picasso.TestUtils.URI_KEY_1;
-import static com.squareup.picasso.TestUtils.URI_KEY_2;
-import static com.squareup.picasso.TestUtils.mockHunter;
-import static com.squareup.picasso.TestUtils.mockNetworkInfo;
+import static it.sephiroth.android.library.picasso.Dispatcher.NetworkBroadcastReceiver;
+import static it.sephiroth.android.library.picasso.Dispatcher.NetworkBroadcastReceiver.EXTRA_AIRPLANE_STATE;
+import static it.sephiroth.android.library.picasso.TestUtils.BITMAP_1;
+import static it.sephiroth.android.library.picasso.TestUtils.BITMAP_2;
+import static it.sephiroth.android.library.picasso.TestUtils.URI_1;
+import static it.sephiroth.android.library.picasso.TestUtils.URI_2;
+import static it.sephiroth.android.library.picasso.TestUtils.URI_KEY_1;
+import static it.sephiroth.android.library.picasso.TestUtils.URI_KEY_2;
+import static it.sephiroth.android.library.picasso.TestUtils.mockHunter;
+import static it.sephiroth.android.library.picasso.TestUtils.mockNetworkInfo;
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;

@@ -13,7 +13,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package com.squareup.picasso;
+package it.sephiroth.android.library.picasso;
 
 import android.app.Notification;
 import android.content.Context;
@@ -34,7 +34,7 @@ import org.mockito.stubbing.Answer;
 import static android.content.ContentResolver.SCHEME_ANDROID_RESOURCE;
 import static android.provider.ContactsContract.Contacts.CONTENT_URI;
 import static android.provider.ContactsContract.Contacts.Photo.CONTENT_DIRECTORY;
-import static com.squareup.picasso.Utils.createKey;
+import static it.sephiroth.android.library.picasso.Utils.createKey;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -73,7 +73,7 @@ class TestUtils {
   static final String RESOURCE_ID_KEY_1 = createKey(new Request.Builder(RESOURCE_ID_1).build());
   static final Uri ASSET_URI_1 = Uri.parse("file:///android_asset/foo/bar.png");
   static final String ASSET_KEY_1 = createKey(new Request.Builder(ASSET_URI_1).build());
-  static final String RESOURCE_PACKAGE = "com.squareup.picasso";
+  static final String RESOURCE_PACKAGE = "it.sephiroth.android.library.picasso";
   static final String RESOURCE_TYPE = "drawable";
   static final String RESOURCE_NAME = "foo";
   static final Uri RESOURCE_ID_URI = new Uri.Builder().scheme(SCHEME_ANDROID_RESOURCE)

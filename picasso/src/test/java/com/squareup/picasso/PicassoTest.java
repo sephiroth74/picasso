@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.squareup.picasso;
+package it.sephiroth.android.library.picasso;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -29,17 +29,17 @@ import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
-import static com.squareup.picasso.Picasso.Listener;
-import static com.squareup.picasso.Picasso.LoadedFrom.MEMORY;
-import static com.squareup.picasso.TestUtils.BITMAP_1;
-import static com.squareup.picasso.TestUtils.URI_1;
-import static com.squareup.picasso.TestUtils.URI_KEY_1;
-import static com.squareup.picasso.TestUtils.mockAction;
-import static com.squareup.picasso.TestUtils.mockCanceledAction;
-import static com.squareup.picasso.TestUtils.mockDeferredRequestCreator;
-import static com.squareup.picasso.TestUtils.mockHunter;
-import static com.squareup.picasso.TestUtils.mockImageViewTarget;
-import static com.squareup.picasso.TestUtils.mockTarget;
+import static it.sephiroth.android.library.picasso.Picasso.Listener;
+import static it.sephiroth.android.library.picasso.Picasso.LoadedFrom.MEMORY;
+import static it.sephiroth.android.library.picasso.TestUtils.BITMAP_1;
+import static it.sephiroth.android.library.picasso.TestUtils.URI_1;
+import static it.sephiroth.android.library.picasso.TestUtils.URI_KEY_1;
+import static it.sephiroth.android.library.picasso.TestUtils.mockAction;
+import static it.sephiroth.android.library.picasso.TestUtils.mockCanceledAction;
+import static it.sephiroth.android.library.picasso.TestUtils.mockDeferredRequestCreator;
+import static it.sephiroth.android.library.picasso.TestUtils.mockHunter;
+import static it.sephiroth.android.library.picasso.TestUtils.mockImageViewTarget;
+import static it.sephiroth.android.library.picasso.TestUtils.mockTarget;
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.fest.assertions.api.Assertions.fail;
 import static org.mockito.Matchers.any;

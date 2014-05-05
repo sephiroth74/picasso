@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.squareup.picasso;
+package it.sephiroth.android.library.picasso;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -35,32 +35,32 @@ import java.util.concurrent.FutureTask;
 
 import static android.graphics.Bitmap.Config.ARGB_8888;
 import static android.graphics.Bitmap.Config.RGB_565;
-import static com.squareup.picasso.BitmapHunter.createBitmapOptions;
-import static com.squareup.picasso.BitmapHunter.forRequest;
-import static com.squareup.picasso.BitmapHunter.requiresInSampleSize;
-import static com.squareup.picasso.BitmapHunter.transformResult;
-import static com.squareup.picasso.Picasso.LoadedFrom.MEMORY;
-import static com.squareup.picasso.TestUtils.ASSET_KEY_1;
-import static com.squareup.picasso.TestUtils.ASSET_URI_1;
-import static com.squareup.picasso.TestUtils.BITMAP_1;
-import static com.squareup.picasso.TestUtils.CONTACT_KEY_1;
-import static com.squareup.picasso.TestUtils.CONTACT_URI_1;
-import static com.squareup.picasso.TestUtils.CONTENT_1_URL;
-import static com.squareup.picasso.TestUtils.CONTENT_KEY_1;
-import static com.squareup.picasso.TestUtils.FILE_1_URL;
-import static com.squareup.picasso.TestUtils.FILE_KEY_1;
-import static com.squareup.picasso.TestUtils.MEDIA_STORE_CONTENT_1_URL;
-import static com.squareup.picasso.TestUtils.MEDIA_STORE_CONTENT_KEY_1;
-import static com.squareup.picasso.TestUtils.RESOURCE_ID_1;
-import static com.squareup.picasso.TestUtils.RESOURCE_ID_KEY_1;
-import static com.squareup.picasso.TestUtils.RESOURCE_ID_URI;
-import static com.squareup.picasso.TestUtils.RESOURCE_ID_URI_KEY;
-import static com.squareup.picasso.TestUtils.RESOURCE_TYPE_URI;
-import static com.squareup.picasso.TestUtils.RESOURCE_TYPE_URI_KEY;
-import static com.squareup.picasso.TestUtils.URI_1;
-import static com.squareup.picasso.TestUtils.URI_KEY_1;
-import static com.squareup.picasso.TestUtils.mockAction;
-import static com.squareup.picasso.TestUtils.mockImageViewTarget;
+import static it.sephiroth.android.library.picasso.BitmapHunter.createBitmapOptions;
+import static it.sephiroth.android.library.picasso.BitmapHunter.forRequest;
+import static it.sephiroth.android.library.picasso.BitmapHunter.requiresInSampleSize;
+import static it.sephiroth.android.library.picasso.BitmapHunter.transformResult;
+import static it.sephiroth.android.library.picasso.Picasso.LoadedFrom.MEMORY;
+import static it.sephiroth.android.library.picasso.TestUtils.ASSET_KEY_1;
+import static it.sephiroth.android.library.picasso.TestUtils.ASSET_URI_1;
+import static it.sephiroth.android.library.picasso.TestUtils.BITMAP_1;
+import static it.sephiroth.android.library.picasso.TestUtils.CONTACT_KEY_1;
+import static it.sephiroth.android.library.picasso.TestUtils.CONTACT_URI_1;
+import static it.sephiroth.android.library.picasso.TestUtils.CONTENT_1_URL;
+import static it.sephiroth.android.library.picasso.TestUtils.CONTENT_KEY_1;
+import static it.sephiroth.android.library.picasso.TestUtils.FILE_1_URL;
+import static it.sephiroth.android.library.picasso.TestUtils.FILE_KEY_1;
+import static it.sephiroth.android.library.picasso.TestUtils.MEDIA_STORE_CONTENT_1_URL;
+import static it.sephiroth.android.library.picasso.TestUtils.MEDIA_STORE_CONTENT_KEY_1;
+import static it.sephiroth.android.library.picasso.TestUtils.RESOURCE_ID_1;
+import static it.sephiroth.android.library.picasso.TestUtils.RESOURCE_ID_KEY_1;
+import static it.sephiroth.android.library.picasso.TestUtils.RESOURCE_ID_URI;
+import static it.sephiroth.android.library.picasso.TestUtils.RESOURCE_ID_URI_KEY;
+import static it.sephiroth.android.library.picasso.TestUtils.RESOURCE_TYPE_URI;
+import static it.sephiroth.android.library.picasso.TestUtils.RESOURCE_TYPE_URI_KEY;
+import static it.sephiroth.android.library.picasso.TestUtils.URI_1;
+import static it.sephiroth.android.library.picasso.TestUtils.URI_KEY_1;
+import static it.sephiroth.android.library.picasso.TestUtils.mockAction;
+import static it.sephiroth.android.library.picasso.TestUtils.mockImageViewTarget;
 import static org.fest.assertions.api.ANDROID.assertThat;
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.fest.assertions.api.Assertions.entry;
