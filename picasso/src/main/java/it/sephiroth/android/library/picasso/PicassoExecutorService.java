@@ -18,6 +18,8 @@ package it.sephiroth.android.library.picasso;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.telephony.TelephonyManager;
+import android.util.Log;
+
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -63,7 +65,7 @@ class PicassoExecutorService extends ThreadPoolExecutor {
             break;
           case TelephonyManager.NETWORK_TYPE_GPRS: // 2G
           case TelephonyManager.NETWORK_TYPE_EDGE:
-            setThreadCount(1);
+            setThreadCount(2);
             break;
           default:
             setThreadCount(DEFAULT_THREAD_COUNT);
@@ -75,6 +77,7 @@ class PicassoExecutorService extends ThreadPoolExecutor {
   }
 
   private void setThreadCount(int threadCount) {
+    Log.i("picasso", "setThreadCount: " + threadCount);
     setCorePoolSize(threadCount);
     setMaximumPoolSize(threadCount);
   }
