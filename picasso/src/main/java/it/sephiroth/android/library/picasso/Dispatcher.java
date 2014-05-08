@@ -26,6 +26,7 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -140,6 +141,11 @@ class Dispatcher {
   void performSubmit(Action action) {
     BitmapHunter hunter = hunterMap.get(action.getKey());
     if (hunter != null) {
+      if(hunter.isCancelled() || action.isCancelled()){
+	      Log.v("picasso", "action is cancelled");
+        hunterMap.remove(action.getKey());
+        return;
+      }
       hunter.attach(action);
       return;
     }

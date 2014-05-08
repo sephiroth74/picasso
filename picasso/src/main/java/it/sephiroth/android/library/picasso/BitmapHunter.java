@@ -124,7 +124,7 @@ abstract class BitmapHunter implements Runnable {
   Bitmap hunt() throws IOException {
     Bitmap bitmap;
 
-    if((action != null && action.isCancelled()) || isCancelled()) {
+    if(isCancelled()) {
       return null;
     }
 
@@ -146,13 +146,13 @@ abstract class BitmapHunter implements Runnable {
       }
     }
 
-    if((action != null && action.isCancelled()) || isCancelled()) {
+    if(isCancelled()) {
       return null;
     }
 
     bitmap = decode(data);
 
-    if((action != null && action.isCancelled()) || isCancelled()) {
+    if(isCancelled()) {
       return null;
     }
 
@@ -171,10 +171,6 @@ abstract class BitmapHunter implements Runnable {
           stats.dispatchBitmapTransformed(bitmap);
         }
       }
-    }
-
-    if((action != null && action.isCancelled()) || isCancelled()) {
-      return null;
     }
 
     return bitmap;
