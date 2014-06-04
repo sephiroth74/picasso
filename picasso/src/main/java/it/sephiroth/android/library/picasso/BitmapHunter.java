@@ -15,13 +15,16 @@
  */
 package it.sephiroth.android.library.picasso;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.os.Build;
 import android.provider.MediaStore;
+import android.util.Log;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -150,15 +153,26 @@ abstract class BitmapHunter implements Runnable {
       return null;
     }
 
-    bitmap = decode(data);
+	if(data.options != null) {
+	  synchronized (BitmapHunter.class) {
+		Log.v("picasso", "synchronized");
+		return decodeAndTransform();
+	  }
+	} else {
+      return decodeAndTransform();
+	}
+  }
+
+  Bitmap decodeAndTransform() throws IOException {
+    Bitmap bitmap = decode(data);
 
     if(isCancelled()) {
-      return null;
+  	  return null;
     }
 
     if (bitmap != null) {
-      stats.dispatchBitmapDecoded(bitmap);
-      if (data.needsTransformation() || exifRotation != 0) {
+  	  stats.dispatchBitmapDecoded(bitmap);
+  	  if (data.needsTransformation() || exifRotation != 0) {
         synchronized (DECODE_LOCK) {
           if (data.needsMatrixTransform() || exifRotation != 0) {
             bitmap = transformResult(data, bitmap, exifRotation);
@@ -170,9 +184,8 @@ abstract class BitmapHunter implements Runnable {
         if (bitmap != null) {
           stats.dispatchBitmapTransformed(bitmap);
         }
-      }
+  	  }
     }
-
     return bitmap;
   }
 
@@ -295,9 +308,14 @@ abstract class BitmapHunter implements Runnable {
   static BitmapFactory.Options createBitmapOptions(Request data) {
     final boolean justBounds = data.hasSize();
     final boolean hasConfig = data.config != null;
+	final boolean hasOptions = data.options != null;
     BitmapFactory.Options options = null;
-    if (justBounds || hasConfig) {
-      options = new BitmapFactory.Options();
+    if (justBounds || hasConfig || hasOptions) {
+	  if(hasOptions) {
+		options = data.options;
+	  } else {
+		options = new BitmapFactory.Options();
+	  }
       options.inJustDecodeBounds = justBounds;
       if (hasConfig) {
         options.inPreferredConfig = data.config;
@@ -360,23 +378,25 @@ abstract class BitmapHunter implements Runnable {
         return null;
       }
 
+	  // WTF?? Let me decide what to do with the original bitmap!
       // If the transformation returned a new bitmap ensure they recycled the original.
-      if (newResult != result && !result.isRecycled()) {
-        Picasso.HANDLER.post(new Runnable() {
-          @Override public void run() {
-            throw new IllegalStateException("Transformation "
-                + transformation.key()
-                + " mutated input Bitmap but failed to recycle the original.");
-          }
-        });
-        return null;
-      }
+//      if (newResult != result && !result.isRecycled()) {
+//        Picasso.HANDLER.post(new Runnable() {
+//          @Override public void run() {
+//            throw new IllegalStateException("Transformation "
+//                + transformation.key()
+//                + " mutated input Bitmap but failed to recycle the original.");
+//          }
+//        });
+//        return null;
+//      }
 
       result = newResult;
     }
     return result;
   }
 
+  @TargetApi (Build.VERSION_CODES.HONEYCOMB)
   static Bitmap transformResult(Request data, Bitmap result, int exifRotation) {
     boolean swapDimens = false; //exifRotation == 90 || exifRotation == 270;
     int inWidth = swapDimens ? result.getHeight() : result.getWidth();
@@ -450,7 +470,16 @@ abstract class BitmapHunter implements Runnable {
     Bitmap newResult =
         Bitmap.createBitmap(result, drawX, drawY, drawWidth, drawHeight, matrix, true);
     if (newResult != result) {
-      result.recycle();
+
+	  // recycle the input bitmap *only* if the passed BitmapFactory.Options
+	  // instance is null or does not provide the inBitmap field
+	  if (Build.VERSION.SDK_INT >= 11 && data.options != null) {
+		 if(data.options.inBitmap == null) {
+			 result.recycle();
+		 }
+	  } else {
+		result.recycle();
+	  }
       result = newResult;
     }
 

@@ -222,6 +222,22 @@ public class RequestCreator {
   }
 
   /**
+   * Instead of let Picasso create a new instance of BitmapFactory.Options, use
+   * this instance instead.<br />
+   * This can be useful if you want to use a single instance of Options, thus preventing
+   * a log of G'cing, and also if you want to take advantage of some of the features of
+   * the Options class itself (like 'inBitmap').
+   * The tradeoff is that using this feature the decoding process needs to be synchronized.
+   *
+   * @param options
+   * @return
+   */
+  public RequestCreator withOptions(BitmapFactory.Options options) {
+    data.options(options);
+	return this;
+  }
+
+  /**
    * Assign a custom {@link Generator} which will be used to decode the Uri,
    * only if the uri scheme is {@link Picasso#SCHEME_CUSTOM}
    * @param generator

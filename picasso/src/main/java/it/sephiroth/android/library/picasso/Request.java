@@ -16,6 +16,7 @@
 package it.sephiroth.android.library.picasso;
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 
 import java.util.ArrayList;
@@ -76,11 +77,13 @@ public final class Request {
   /** cache to be used */
   public final Cache cache;
   public final Cache diskCache;
+  /** Use this options instead of generating new ones every time */
+  public final BitmapFactory.Options options;
 
   private Request(Uri uri, int resourceId, List<Transformation> transformations, int targetWidth,
       int targetHeight, boolean resizeOnlyIfBigger, boolean centerCrop, boolean centerInside,
       float rotationDegrees, float rotationPivotX, float rotationPivotY, boolean hasRotationPivot,
-      Bitmap.Config config, Generator generator, Cache cache, Cache diskCache) {
+      Bitmap.Config config, Generator generator, Cache cache, Cache diskCache, BitmapFactory.Options options) {
     this.uri = uri;
     this.resourceId = resourceId;
     if (transformations == null) {
@@ -101,6 +104,7 @@ public final class Request {
     this.generator = generator;
     this.cache = cache;
     this.diskCache = diskCache;
+	this.options = options;
   }
 
   String getName() {
@@ -152,6 +156,7 @@ public final class Request {
     private Generator generator;
     private Cache cache;
     private Cache diskCache;
+	private BitmapFactory.Options options;
 
     /** Start building a request using the specified {@link Uri}. */
     public Builder(Uri uri) {
@@ -186,6 +191,7 @@ public final class Request {
       config = request.config;
       cache = request.cache;
       diskCache = request.diskCache;
+	  options = request.options;
     }
 
     boolean hasImage() {
@@ -319,6 +325,11 @@ public final class Request {
       return this;
     }
 
+	public Builder options(BitmapFactory.Options options) {
+	  this.options = options;
+      return this;
+	}
+
     public Builder setGenerator(Generator generator) {
       this.generator = generator;
       return this;
@@ -371,7 +382,7 @@ public final class Request {
       }
       return new Request(uri, resourceId, transformations, targetWidth, targetHeight,
           resizeOnlyIfBigger, centerCrop, centerInside, rotationDegrees, rotationPivotX,
-          rotationPivotY, hasRotationPivot, config, generator, cache, diskCache);
+          rotationPivotY, hasRotationPivot, config, generator, cache, diskCache, options);
     }
   }
 }
