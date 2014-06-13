@@ -24,6 +24,7 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.MediaStore;
+import android.util.Log;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -341,7 +342,7 @@ abstract class BitmapHunter implements Runnable {
   static void calculateInSampleSize(int reqWidth, int reqHeight, int width, int height,
       BitmapFactory.Options options) {
     int sampleSize = 1;
-    if (height > reqHeight || width > reqWidth) {
+    if ((height > reqHeight && reqHeight > 0) || (width > reqWidth && reqWidth > 0)) {
       final int heightRatio = Math.round((float) height / (float) reqHeight);
       final int widthRatio = Math.round((float) width / (float) reqWidth);
       sampleSize = heightRatio < widthRatio ? heightRatio : widthRatio;

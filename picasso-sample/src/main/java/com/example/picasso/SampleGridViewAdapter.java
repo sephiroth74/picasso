@@ -57,17 +57,18 @@ final class SampleGridViewAdapter extends BaseAdapter {
         .load(url) //
 //        .placeholder(R.drawable.placeholder) //
 //        .error(R.drawable.error) //
-        .resizeByMaxSide(360, true)
+        //.resizeByMaxSide(360, true)
+        .resize(100,0,true)
         .config(Bitmap.Config.RGB_565)
         .into(view, new Callback() {
           @Override
           public void onSuccess() {
-            Log.d("picasso", "success: " + view.getDrawable().getIntrinsicWidth() + "x" + view.getDrawable().getIntrinsicHeight() );
+//            Log.d("picasso", "success: " + view.getDrawable().getIntrinsicWidth() + "x" + view.getDrawable().getIntrinsicHeight() );
           }
 
           @Override
           public void onError() {
-            Log.e("adapter", "onError");
+//            Log.e("adapter", "onError");
           }
         });
 

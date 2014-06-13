@@ -118,7 +118,7 @@ public final class Request {
   }
 
   public boolean hasSize() {
-    return targetWidth != 0;
+    return (targetWidth != 0 || targetHeight != 0);
   }
 
   public boolean hasGenerator() {
@@ -130,7 +130,7 @@ public final class Request {
   }
 
   boolean needsMatrixTransform() {
-    return targetWidth != 0 || rotationDegrees != 0;
+    return targetWidth != 0 || targetHeight != 0 || rotationDegrees != 0;
   }
 
   boolean hasCustomTransformations() {
@@ -269,6 +269,8 @@ public final class Request {
     /** Clear the center crop transformation flag, if set. */
     public Builder clearResizeByMaxSide() {
       resizeByMaxSide = false;
+      targetWidth = 0;
+      targetHeight = 0;
       return this;
     }
 
