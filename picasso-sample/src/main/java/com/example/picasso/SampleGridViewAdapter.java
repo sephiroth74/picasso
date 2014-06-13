@@ -37,10 +37,12 @@ final class SampleGridViewAdapter extends BaseAdapter {
   }
 
   @Override public View getView(int position, View convertView, ViewGroup parent) {
-    SquaredImageView view = (SquaredImageView) convertView;
-    if (view == null) {
+    final SquaredImageView view;
+    if (convertView == null) {
       view = new SquaredImageView(context);
       view.setScaleType(CENTER_CROP);
+    } else {
+      view = (SquaredImageView) convertView;
     }
 
     view.setImageBitmap(null);
@@ -55,12 +57,12 @@ final class SampleGridViewAdapter extends BaseAdapter {
         .load(url) //
 //        .placeholder(R.drawable.placeholder) //
 //        .error(R.drawable.error) //
-        .fit() //
+        .resizeByMaxSide(360, true)
         .config(Bitmap.Config.RGB_565)
         .into(view, new Callback() {
           @Override
           public void onSuccess() {
-
+            Log.d("picasso", "success: " + view.getDrawable().getIntrinsicWidth() + "x" + view.getDrawable().getIntrinsicHeight() );
           }
 
           @Override

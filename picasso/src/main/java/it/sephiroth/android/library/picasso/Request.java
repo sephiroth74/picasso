@@ -62,6 +62,7 @@ public final class Request {
    * This is mutually exclusive with {@link #centerCrop}.
    */
   public final boolean centerInside;
+  public final boolean resizeByMaxSide;
   /** Amount to rotate the image in degrees. */
   public final float rotationDegrees;
   /** Rotation pivot on the X axis. */
@@ -82,6 +83,7 @@ public final class Request {
 
   private Request(Uri uri, int resourceId, List<Transformation> transformations, int targetWidth,
       int targetHeight, boolean resizeOnlyIfBigger, boolean centerCrop, boolean centerInside,
+      boolean resizeByMaxSide,
       float rotationDegrees, float rotationPivotX, float rotationPivotY, boolean hasRotationPivot,
       Bitmap.Config config, Generator generator, Cache cache, Cache diskCache, BitmapFactory.Options options) {
     this.uri = uri;
@@ -100,6 +102,7 @@ public final class Request {
     this.rotationPivotY = rotationPivotY;
     this.hasRotationPivot = hasRotationPivot;
     this.resizeOnlyIfBigger = resizeOnlyIfBigger;
+    this.resizeByMaxSide = resizeByMaxSide;
     this.config = config;
     this.generator = generator;
     this.cache = cache;
@@ -146,6 +149,7 @@ public final class Request {
     private int targetHeight;
     private boolean centerCrop;
     private boolean centerInside;
+    private boolean resizeByMaxSide;
     private float rotationDegrees;
     private float rotationPivotX;
     private float rotationPivotY;
@@ -235,17 +239,36 @@ public final class Request {
       return resize(targetWidth, targetHeight, false);
     }
 
-    /** Resize the image to the specified size in pixels. */
+    /**
+     * Resize the image to the specified size in pixels.
+     * Value '0' is allowed for one of the 2 arguments width/height.
+     * If '0' is used for the width argument, then the image will be scaled
+     * according to the height argument, mantaining the same aspect ratio.
+     */
     public Builder resize(int targetWidth, int targetHeight, boolean onlyIfBigger) {
-      if (targetWidth <= 0) {
-        throw new IllegalArgumentException("Width must be positive number.");
-      }
-      if (targetHeight <= 0) {
-        throw new IllegalArgumentException("Height must be positive number.");
+      if (targetWidth <= 0 && targetHeight <= 0) {
+        throw new IllegalArgumentException("Width or Height must be positive number.");
       }
       this.targetWidth = targetWidth;
       this.targetHeight = targetHeight;
       this.resizeOnlyIfBigger = onlyIfBigger;
+      return this;
+    }
+
+    /** Resizes the image by its max side */
+    public Builder resizeByMaxSide(int maxSize, boolean onlyIfBigger) {
+      if (centerInside || centerCrop) {
+        throw new IllegalStateException("Resize by max side cannot be used with centerCrop or " +
+            "centerInside");
+      }
+      this.targetWidth = maxSize;
+      this.resizeByMaxSide = true;
+      return this;
+    }
+
+    /** Clear the center crop transformation flag, if set. */
+    public Builder clearResizeByMaxSide() {
+      resizeByMaxSide = false;
       return this;
     }
 
@@ -255,6 +278,7 @@ public final class Request {
       targetHeight = 0;
       centerCrop = false;
       centerInside = false;
+      resizeOnlyIfBigger = false;
       return this;
     }
 
@@ -264,8 +288,9 @@ public final class Request {
      * that it fills the requested bounds and then crops the extra.
      */
     public Builder centerCrop() {
-      if (centerInside) {
-        throw new IllegalStateException("Center crop can not be used after calling centerInside");
+      if (centerInside || resizeByMaxSide) {
+        throw new IllegalStateException("Center crop can not be used after calling centerInside " +
+            "or resizeByMaxSide");
       }
       centerCrop = true;
       return this;
@@ -282,8 +307,9 @@ public final class Request {
      * This scales the image so that both dimensions are equal to or less than the requested bounds.
      */
     public Builder centerInside() {
-      if (centerCrop) {
-        throw new IllegalStateException("Center inside can not be used after calling centerCrop");
+      if (centerCrop || resizeByMaxSide) {
+        throw new IllegalStateException("Center inside can not be used after calling centerCrop" +
+            " or resizeByMaxSide");
       }
       centerInside = true;
       return this;
@@ -381,8 +407,10 @@ public final class Request {
         throw new IllegalStateException("Center inside requires calling resize.");
       }
       return new Request(uri, resourceId, transformations, targetWidth, targetHeight,
-          resizeOnlyIfBigger, centerCrop, centerInside, rotationDegrees, rotationPivotX,
-          rotationPivotY, hasRotationPivot, config, generator, cache, diskCache, options);
+          resizeOnlyIfBigger, centerCrop, centerInside,
+          resizeByMaxSide,
+          rotationDegrees, rotationPivotX, rotationPivotY, hasRotationPivot, config, generator,
+          cache, diskCache, options);
     }
   }
 }

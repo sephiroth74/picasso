@@ -168,7 +168,9 @@ public class RequestCreator {
   }
 
   /**
-   * Resizes the image to the specified size in pixels
+   * Resizes the image to the specified size in pixels.
+   * Notice that '0' can be passed to one of the 2 arguments (width/height). In this case only the
+   * other argument will be used to scale the bitmap, thus mantaining the current ratio.
    * @param targetWidth target width
    * @param targetHeight target height
    * @param onlyIfBigger If true the bitmap will be resized only only if bigger than
@@ -176,6 +178,18 @@ public class RequestCreator {
    */
   public RequestCreator resize(int targetWidth, int targetHeight, boolean onlyIfBigger) {
     data.resize(targetWidth, targetHeight, onlyIfBigger);
+    return this;
+  }
+
+  /**
+   * Resizes the image by its maximum side. This means that the image will be resized that its
+   * biggest side will fit the 'targetSide' passed.
+   * @param targetSize the desired target side size
+   * @param onlyIfBigger resize only if bigger, always otherwise
+   * @return
+   */
+  public RequestCreator resizeByMaxSide(int targetSize, boolean onlyIfBigger) {
+    data.resizeByMaxSide(targetSize, onlyIfBigger);
     return this;
   }
 

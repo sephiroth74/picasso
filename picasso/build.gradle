@@ -4,18 +4,17 @@ group GROUP
 version VERSION_NAME
 
 dependencies {
-    compile 'com.android.support:support-v4:19.0.+'
     compile 'com.squareup.okhttp:okhttp:1.5.4+'
     compile 'com.intellij:annotations:9.0.4'
 }
 
 android {
-    compileSdkVersion 19
-    buildToolsVersion "19.0.3"
+    compileSdkVersion Integer.parseInt(ANDROID_BUILD_SDK_VERSION)
+    buildToolsVersion ANDROID_BUILD_TOOLS_VERSION
 
     defaultConfig {
         minSdkVersion 9
-        targetSdkVersion 19
+        targetSdkVersion Integer.parseInt(ANDROID_BUILD_TARGET_SDK_VERSION)
         versionCode 1
         versionName version
     }

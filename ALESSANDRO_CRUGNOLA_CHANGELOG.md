@@ -48,7 +48,15 @@ Added 2 new methods to request a resize:
 	public RequestCreator resize(int targetWidth, int targetHeight, boolean onlyIfBigger);
 
 
-basically you can pass an option to skip the resize operation if the loaded bitmap is smaller than the passed `targetWidth` and `targetHeight`
+basically you can pass an option to skip the resize operation if the loaded bitmap is smaller than the passed `targetWidth` and `targetHeight`. 
+
+Moreover one of the 2 arguments can be '0'. This will resize the image using the other non-zero argument and the image will be scaled keeping its ratio.
+
+Added another method to resize the image by its largest side.
+
+	public RequestCreator resizeByMaxSide(int targetSize, boolean onlyIfBigger);
+	
+The bitmap will resized to the passed 'targetSize' by its largest side. Let's say the decoded image is 400x486px and the targetSize passed is 360. Then the result bitmap will be 296x360px
 
 
 ###BitmapFactory.Options

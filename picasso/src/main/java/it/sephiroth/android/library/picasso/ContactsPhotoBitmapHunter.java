@@ -111,7 +111,7 @@ class ContactsPhotoBitmapHunter extends BitmapHunter {
       } finally {
         Utils.closeQuietly(is);
       }
-      calculateInSampleSize(data.targetWidth, data.targetHeight, options);
+      calculateInSampleSize(data, options);
     }
     return BitmapFactory.decodeStream(stream, null, options);
   }

@@ -24,7 +24,6 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.MediaStore;
-import android.util.Log;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -155,7 +154,6 @@ abstract class BitmapHunter implements Runnable {
 
 	if(data.options != null) {
 	  synchronized (BitmapHunter.class) {
-		Log.v("picasso", "synchronized");
 		return decodeAndTransform();
 	  }
 	} else {
@@ -328,6 +326,14 @@ abstract class BitmapHunter implements Runnable {
     return options != null && options.inJustDecodeBounds;
   }
 
+  static void calculateInSampleSize(Request data, BitmapFactory.Options options) {
+    if (data.resizeByMaxSide) {
+      calculateInSampleSize(data.targetWidth, data.targetWidth, options.outWidth, options.outHeight, options);
+    } else {
+      calculateInSampleSize(data.targetWidth, data.targetHeight, options.outWidth, options.outHeight, options);
+    }
+  }
+
   static void calculateInSampleSize(int reqWidth, int reqHeight, BitmapFactory.Options options) {
     calculateInSampleSize(reqWidth, reqHeight, options.outWidth, options.outHeight, options);
   }
@@ -410,6 +416,7 @@ abstract class BitmapHunter implements Runnable {
     Matrix matrix = new Matrix();
 
     if (data.needsMatrixTransform()) {
+      int targetSize = data.targetWidth;
       int targetWidth = swapDimens ? data.targetHeight : data.targetWidth;
       int targetHeight = swapDimens ? data.targetWidth : data.targetHeight;
       boolean resizeOnlyIfBigger = data.resizeOnlyIfBigger;
@@ -450,10 +457,28 @@ abstract class BitmapHunter implements Runnable {
             && (inWidth > targetWidth || inHeight > targetHeight))) {
           matrix.preScale(scale, scale);
         }
-      } else if (targetWidth != 0 && targetHeight != 0 //
+      } else if (data.resizeByMaxSide && (targetSize != inWidth || targetSize != inHeight)) {
+        float sx;
+
+        if(inWidth > inHeight){
+          sx = targetSize / (float) inWidth;
+        } else {
+          sx = targetSize / (float) inHeight;
+        }
+
+
+        if (!resizeOnlyIfBigger || (resizeOnlyIfBigger
+            && (sx < 1.0))) {
+          matrix.preScale(sx, sx);
+        }
+
+      } else if ((targetWidth + targetHeight > 0) //
           && (targetWidth != inWidth || targetHeight != inHeight)) {
         // If an explicit target size has been specified and they do not match the results bounds,
         // pre-scale the existing matrix appropriately.
+        if (targetWidth == 0) targetWidth = inWidth;
+        if (targetHeight == 0) targetHeight = inHeight;
+
         float sx = targetWidth / (float) inWidth;
         float sy = targetHeight / (float) inHeight;
         if (!resizeOnlyIfBigger || (resizeOnlyIfBigger
@@ -470,16 +495,15 @@ abstract class BitmapHunter implements Runnable {
     Bitmap newResult =
         Bitmap.createBitmap(result, drawX, drawY, drawWidth, drawHeight, matrix, true);
     if (newResult != result) {
-
-	  // recycle the input bitmap *only* if the passed BitmapFactory.Options
-	  // instance is null or does not provide the inBitmap field
-	  if (Build.VERSION.SDK_INT >= 11 && data.options != null) {
-		 if(data.options.inBitmap == null) {
-			 result.recycle();
-		 }
-	  } else {
-		result.recycle();
-	  }
+      // recycle the input bitmap *only* if the passed BitmapFactory.Options
+      // instance is null or does not provide the inBitmap field
+      if (Build.VERSION.SDK_INT >= 11 && data.options != null) {
+       if(data.options.inBitmap == null) {
+         result.recycle();
+       }
+      } else {
+        result.recycle();
+      }
       result = newResult;
     }
 
