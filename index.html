@@ -32,36 +32,134 @@
     <div id="main_content_wrap" class="outer">
       <section id="main_content" class="inner">
         <h3>
-<a name="welcome-to-github-pages" class="anchor" href="#welcome-to-github-pages"><span class="octicon octicon-link"></span></a>Welcome to GitHub Pages.</h3>
+<a name="welcome" class="anchor" href="#welcome"><span class="octicon octicon-link"></span></a>Welcome Picasso (fork).</h3>
 
-<p>This automatic page generator is the easiest way to create beautiful pages for all of your projects. Author your page content here using GitHub Flavored Markdown, select a template crafted by a designer, and publish. After your page is generated, you can check out the new branch:</p>
+<p>
+<a href="http://square.github.io/picasso/">Picasso</a> is <cite>a powerful image downloading and caching library for Android.</cite>
+<br />This page contains all the modifications I've made to the original code of Picasso.
+</p>
 
-<pre><code>$ cd your_repo_root/repo_name
-$ git fetch origin
-$ git checkout gh-pages
+<h3><a name="installation" class="anchor" href="#installation"><span class="octicon octicon-link"></span></a>Installation.</h3>
+<p>MAVEN</p>
+
+<p><pre><code>&lt;dependency>
+  &lt;groupId>it.sephiroth.android.library.picasso&lt;/groupId>
+  &lt;artifactId>picasso&lt;/artifactId>
+  &lt;version>2.3.3.1&lt;/version>
+&lt;/dependency></code></pre></p>
+
+
+<h3><a name="changes" class="anchor" href="#changes"><span class="octicon octicon-link"></span></a>Changes.</h3>
+<p>
+Here's a list of the major changes I've made to the original picasso code
+</p>
+
+<h4>Cache</h4>
+<p>Added the possibility to use an external cache instance per request. Example:</p>
+<p>
+<pre><code>// creating a cache object with 1MB max size
+Cache cache = new LruCache( 1024*1024*1 );
+
+// now create a new request which will use this cache object
+Picasso.with( this )
+    .load( file )
+    .withCache( myCache )
+    .into( imageView );
 </code></pre>
+</p>
+<p>
+<blockquote>Remember to clear the cache when you don't need that anymore ( using cache.clear() )</blockquote>
+</p>
 
-<p>If you're using the GitHub for Mac, simply sync your repository and you'll see the new branch.</p>
+<h4>Generators</h4>
+<p>
+Generators can be used to load images which cannot be loaded using the common scheme convention. There are different situations when you need to generate a Bitmap which is not directly related to a file or url or even a real bitmap resource. In this case you can use the scheme "custom.resource" with a Generator. A Generator is a simple interface with only one method:
+</p>
+<p>
+<pre><code>public interface Generator {
+    Bitmap decode( String path ) throws IOException;
+}
+</code></pre></p>
+<p>So you can use a generator in this way:</p>
+<p>
+<pre><code>Picasso.with(this)
+    .load( Uri.parse( Picasso.SCHEME_CUSTOM + "://" + file ) )
+    .withGenerator( new Generator() {
+
+        @Override
+        public Bitmap decode( String path ) throws IOException {
+            return whatever(path);
+        }
+     } )
+    .into( imageView );
+</code></pre></p>
+
+<h4>Fade Time</h4>
+<p>
+Added <code>.fade(ms time)</code> method in the RequestCreator class in order to let you change the fade in animation time.<br />Usage:
+</p>
+<p><pre><code>Picasso.with(this)
+    .load(file)
+    .fade(500)
+    .into(imageView);
+</code></pre></p>
+
+<h4>Resize</h4>
+<p>Both the original Picasso methods resize and resizeDimen have been modified in the followings new methods:</p>
+<p>
+<pre><code>public RequestCreator resizeDimen(int targetWidthResId, int targetHeightResId, boolean onlyIfBigger);
+public RequestCreator resize(int targetWidth, int targetHeight, boolean onlyIfBigger);</code></pre></p>
+<p>
+basically you can pass an option to skip the resize operation if the loaded bitmap is smaller than the passed targetWidth and targetHeight
+</p>
+<p><pre><code>public RequestCreator resizeByMaxSide();</code></pre></p>
+<p>Used in conjunction with the <code>resize</code> method, this method will force picasso to resize the encoded bitmap taking its largest side into cosideration.<br />Let's say the decoded image is 400x486px and the resize method is used with 360, 360 as arguments. Then the result bitmap will be 296x360px</p>
+
+
+
+<h4>BitmapFactory.Options</h4>
+<p>Picasso uses a default BitmapFactory.Options object, every time, to decode the required Bitmap. I've added a method withOptions in the RequestCreator which allow you to pass your own Options object which will be used to decode the image. Eventually you can use this in order to take advantage of the 'inBitmap' field of the Options class, thus preventing picasso to spend too much time on Garbage Collection. The tradeoff of using this method is that the internal "decode" method will be synchronized.<br />Example:</p>
+<p>
+<pre><code>BitmapFactory.Options options = new BitmapFactory.Options();
+options.inBitmap = myTemporaryBitmap;
+
+Picasso.with(this)
+    .load(file)
+    .withOptions(options)
+    .into(imageView);
+</code></pre></p>
+
+
+<h4>DiskCache</h4>
+<p>Added <code>.withDiskCache(Cache cache)</code> method. This method doesn't override the internal picasso cache, instead offer a second option to store (and restore) images from a local disk cache.</p>
+<p>The <code>Cache</code> interface is used to pass the cache instance to be used. Once a diskCache is passed, the new picasso lifecycle will be:</p>
+<ul>
+<li>if !skipMemoryCache then check if bitmap is in the internal cache</li>
+<li>check if bitmap is in the diskCache</li>
+<li>decode..</li>
+<li>save bitmap in the internal cache</li>
+<li>save bitmap in the diskCache</li>
+</ul>
+
+<h4>Recycle exception</h4>
+<p>Picasso will throw an exception if you don't recycle the bitmap passed to a <code>Transformation</code> instance. This is bad and has been removed in this fork. You'll decide what to do with the original bitmap.</p>
+
+<h4>Use batch</h4>
+<p>Added <code>setUseBatch(boolean useBatch)</code> in the main Picasso instance. By default Picasso will try to dispatch the completion events in a batch. You can turn this off if this feature is causing you UI lags.</p>
 
 <h3>
-<a name="designer-templates" class="anchor" href="#designer-templates"><span class="octicon octicon-link"></span></a>Designer Templates</h3>
+<a name="contributor" class="anchor" href="#contributor"><span class="octicon octicon-link"></span></a>Contributor</h3>
 
-<p>We've crafted some handsome templates for you to use. Go ahead and continue to layouts to browse through them. You can easily go back to edit your page before publishing. After publishing your page, you can revisit the page generator and switch to another theme. Your Page content will be preserved if it remained markdown format.</p>
+<p><a href="https://plus.google.com/+AlessandroCrugnola/posts">Alessandro Crugnola</a></p>
 
-<h3>
-<a name="rather-drive-stick" class="anchor" href="#rather-drive-stick"><span class="octicon octicon-link"></span></a>Rather Drive Stick?</h3>
-
-<p>If you prefer to not use the automatic generator, push a branch named <code>gh-pages</code> to your repository to create a page manually. In addition to supporting regular HTML content, GitHub Pages support Jekyll, a simple, blog aware static site generator written by our own Tom Preston-Werner. Jekyll makes it easy to create site-wide headers and footers without having to copy them across every page. It also offers intelligent blog support and other advanced templating features.</p>
 
 <h3>
-<a name="authors-and-contributors" class="anchor" href="#authors-and-contributors"><span class="octicon octicon-link"></span></a>Authors and Contributors</h3>
+<a name="javadoc" class="anchor" href="#javadoc"><span class="octicon octicon-link"></span></a>Javadoc</h3>
 
-<p>You can <a href="https://github.com/blog/821" class="user-mention">@mention</a> a GitHub username to generate a link to their profile. The resulting <code>&lt;a&gt;</code> element will link to the contributor's GitHub Profile. For example: In 2007, Chris Wanstrath (<a href="https://github.com/defunkt" class="user-mention">@defunkt</a>), PJ Hyett (<a href="https://github.com/pjhyett" class="user-mention">@pjhyett</a>), and Tom Preston-Werner (<a href="https://github.com/mojombo" class="user-mention">@mojombo</a>) founded GitHub.</p>
+<p>
+View the complete <a href="javadoc/index.html">Javadoc</a>.
+</p>
 
-<h3>
-<a name="support-or-contact" class="anchor" href="#support-or-contact"><span class="octicon octicon-link"></span></a>Support or Contact</h3>
-
-<p>Having trouble with Pages? Check out the documentation at <a href="http://help.github.com/pages">http://help.github.com/pages</a> or contact <a href="mailto:support@github.com">support@github.com</a> and we’ll help you sort it out.</p>
       </section>
     </div>
 
