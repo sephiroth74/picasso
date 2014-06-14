@@ -50,8 +50,6 @@ Added 2 new methods to request a resize:
 
 basically you can pass an option to skip the resize operation if the loaded bitmap is smaller than the passed `targetWidth` and `targetHeight`. 
 
-Moreover one of the 2 arguments can be '0'. This will resize the image using the other non-zero argument and the image will be scaled keeping its ratio.
-
 Added another method to resize the image by its largest side.
 
 	public RequestCreator resizeByMaxSide(int targetSize, boolean onlyIfBigger);

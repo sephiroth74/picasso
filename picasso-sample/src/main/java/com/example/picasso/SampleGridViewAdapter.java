@@ -2,6 +2,7 @@ package com.example.picasso;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,8 +33,19 @@ final class SampleGridViewAdapter extends BaseAdapter {
     urls.addAll(copy);
     urls.addAll(copy);
 
-    Picasso.with(context).setIndicatorsEnabled(true);
+    //Picasso.with(context).setIndicatorsEnabled(true);
     Picasso.with(context).setUseBatch(false);
+
+    DisplayMetrics metrics = context.getResources().getDisplayMetrics();
+    Log.e("picasso", "density: " + metrics.density);
+    Log.e("picasso", "screen inches: " + getScreenInches(context));
+  }
+
+  public static double getScreenInches( Context context ) {
+    DisplayMetrics metrics = context.getResources().getDisplayMetrics();
+    double w1 = ( (double) metrics.widthPixels ) / metrics.densityDpi;
+    double h1 = ( (double) metrics.heightPixels ) / metrics.densityDpi;
+    return Math.sqrt( Math.pow( w1, 2 ) + Math.pow( h1, 2 ) );
   }
 
   @Override public View getView(int position, View convertView, ViewGroup parent) {
@@ -57,13 +69,13 @@ final class SampleGridViewAdapter extends BaseAdapter {
         .load(url) //
 //        .placeholder(R.drawable.placeholder) //
 //        .error(R.drawable.error) //
-        //.resizeByMaxSide(360, true)
-        .resize(100,0,true)
         .config(Bitmap.Config.RGB_565)
+        .resize(300, 300)
+        .centerInside()
         .into(view, new Callback() {
           @Override
           public void onSuccess() {
-//            Log.d("picasso", "success: " + view.getDrawable().getIntrinsicWidth() + "x" + view.getDrawable().getIntrinsicHeight() );
+            Log.d("picasso", "success: " + view.getDrawable().getIntrinsicWidth() + "x" + view.getDrawable().getIntrinsicHeight() );
           }
 
           @Override

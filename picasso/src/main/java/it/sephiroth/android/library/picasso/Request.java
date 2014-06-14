@@ -118,7 +118,7 @@ public final class Request {
   }
 
   public boolean hasSize() {
-    return (targetWidth != 0 || targetHeight != 0);
+    return targetWidth != 0;
   }
 
   public boolean hasGenerator() {
@@ -130,7 +130,7 @@ public final class Request {
   }
 
   boolean needsMatrixTransform() {
-    return targetWidth != 0 || targetHeight != 0 || rotationDegrees != 0;
+    return targetWidth != 0 || rotationDegrees != 0;
   }
 
   boolean hasCustomTransformations() {
@@ -239,15 +239,13 @@ public final class Request {
       return resize(targetWidth, targetHeight, false);
     }
 
-    /**
-     * Resize the image to the specified size in pixels.
-     * Value '0' is allowed for one of the 2 arguments width/height.
-     * If '0' is used for the width argument, then the image will be scaled
-     * according to the height argument, mantaining the same aspect ratio.
-     */
+    /** Resize the image to the specified size in pixels. */
     public Builder resize(int targetWidth, int targetHeight, boolean onlyIfBigger) {
-      if (targetWidth <= 0 && targetHeight <= 0) {
-        throw new IllegalArgumentException("Width or Height must be positive number.");
+      if (targetWidth <= 0) {
+        throw new IllegalArgumentException("Width must be positive number.");
+      }
+      if (targetHeight <= 0) {
+        throw new IllegalArgumentException("Height must be positive number.");
       }
       this.targetWidth = targetWidth;
       this.targetHeight = targetHeight;

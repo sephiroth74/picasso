@@ -168,9 +168,7 @@ public class RequestCreator {
   }
 
   /**
-   * Resizes the image to the specified size in pixels.
-   * Notice that '0' can be passed to one of the 2 arguments (width/height). In this case only the
-   * other argument will be used to scale the bitmap, thus mantaining the current ratio.
+   * Resizes the image to the specified size in pixels
    * @param targetWidth target width
    * @param targetHeight target height
    * @param onlyIfBigger If true the bitmap will be resized only only if bigger than

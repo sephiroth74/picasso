@@ -24,7 +24,6 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.MediaStore;
-import android.util.Log;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -473,13 +472,10 @@ abstract class BitmapHunter implements Runnable {
           matrix.preScale(sx, sx);
         }
 
-      } else if ((targetWidth + targetHeight > 0) //
+      } else if (targetWidth != 0 && targetHeight != 0 //
           && (targetWidth != inWidth || targetHeight != inHeight)) {
         // If an explicit target size has been specified and they do not match the results bounds,
         // pre-scale the existing matrix appropriately.
-        if (targetWidth == 0) targetWidth = inWidth;
-        if (targetHeight == 0) targetHeight = inHeight;
-
         float sx = targetWidth / (float) inWidth;
         float sy = targetHeight / (float) inHeight;
         if (!resizeOnlyIfBigger || (resizeOnlyIfBigger
