@@ -124,7 +124,7 @@ class TestUtils {
   static Action mockAction(String key, Request request, Object target) {
     Action action = mock(Action.class);
     when(action.getKey()).thenReturn(key);
-    when(action.getData()).thenReturn(request);
+    when(action.getRequest()).thenReturn(request);
     when(action.getTarget()).thenReturn(target);
     when(action.getPicasso()).thenReturn(mock(Picasso.class));
     return action;
@@ -170,7 +170,14 @@ class TestUtils {
   }
 
   static NetworkInfo mockNetworkInfo() {
-    return mock(NetworkInfo.class);
+    return mockNetworkInfo(false);
+  }
+
+  static NetworkInfo mockNetworkInfo(boolean isConnected) {
+    NetworkInfo mock = mock(NetworkInfo.class);
+    when(mock.isConnected()).thenReturn(isConnected);
+    when(mock.isConnectedOrConnecting()).thenReturn(isConnected);
+    return mock;
   }
 
   static InputStream mockInputStream() throws IOException {
@@ -178,12 +185,18 @@ class TestUtils {
   }
 
   static BitmapHunter mockHunter(String key, Bitmap result, boolean skipCache) {
+    return mockHunter(key, result, skipCache, null);
+  }
+
+  static BitmapHunter mockHunter(String key, Bitmap result, boolean skipCache, Action action) {
     Request data = new Request.Builder(URI_1).build();
     BitmapHunter hunter = mock(BitmapHunter.class);
     when(hunter.getKey()).thenReturn(key);
     when(hunter.getResult()).thenReturn(result);
     when(hunter.getData()).thenReturn(data);
     when(hunter.shouldSkipMemoryCache()).thenReturn(skipCache);
+    when(hunter.getAction()).thenReturn(action);
+    when(hunter.getPicasso()).thenReturn(mock(Picasso.class));
     return hunter;
   }
 

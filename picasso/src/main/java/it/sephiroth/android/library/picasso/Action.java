@@ -31,7 +31,7 @@ abstract class Action<T> {
   }
 
   final Picasso picasso;
-  final Request data;
+  final Request request;
   final WeakReference<T> target;
   final boolean skipCache;
   final int errorResId;
@@ -39,12 +39,13 @@ abstract class Action<T> {
   final String key;
   final long fadeTime;
 
+  boolean willReplay;
   boolean cancelled;
 
-  Action(Picasso picasso, T target, Request data, boolean skipCache, long fadeTime,
+  Action(Picasso picasso, T target, Request request, boolean skipCache, long fadeTime,
       int errorResId, Drawable errorDrawable, String key) {
     this.picasso = picasso;
-    this.data = data;
+    this.request = request;
     this.target = new RequestWeakReference<T>(this, target, picasso.referenceQueue);
     this.skipCache = skipCache;
     this.fadeTime = fadeTime;
@@ -61,8 +62,8 @@ abstract class Action<T> {
     cancelled = true;
   }
 
-  Request getData() {
-    return data;
+  Request getRequest() {
+    return request;
   }
 
   T getTarget() {
@@ -75,6 +76,10 @@ abstract class Action<T> {
 
   boolean isCancelled() {
     return cancelled;
+  }
+
+  boolean willReplay() {
+    return willReplay;
   }
 
   Picasso getPicasso() {

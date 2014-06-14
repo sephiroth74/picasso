@@ -20,6 +20,7 @@ import android.graphics.Bitmap;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import java.io.IOException;
+import java.io.InputStream;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -33,6 +34,7 @@ import static it.sephiroth.android.library.picasso.TestUtils.URI_KEY_1;
 import static it.sephiroth.android.library.picasso.TestUtils.mockInputStream;
 import static it.sephiroth.android.library.picasso.TestUtils.mockNetworkInfo;
 import static org.fest.assertions.api.Assertions.assertThat;
+import static org.fest.assertions.api.Assertions.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Mockito.mock;
@@ -61,7 +63,7 @@ public class NetworkBitmapHunterTest {
     Action action = TestUtils.mockAction(URI_KEY_1, URI_1);
     NetworkBitmapHunter hunter =
         new NetworkBitmapHunter(picasso, dispatcher, cache, stats, action, downloader);
-    hunter.decode(action.getData());
+    hunter.decode(action.getRequest());
     verify(downloader).load(URI_1, false);
   }
 
@@ -70,7 +72,7 @@ public class NetworkBitmapHunterTest {
     NetworkBitmapHunter hunter =
         new NetworkBitmapHunter(picasso, dispatcher, cache, stats, action, downloader);
     hunter.retryCount = 0;
-    hunter.decode(action.getData());
+    hunter.decode(action.getRequest());
     verify(downloader).load(URI_1, true);
   }
 
@@ -94,7 +96,7 @@ public class NetworkBitmapHunterTest {
   @Test public void shouldRetryWithConnectedNetworkInfo() throws Exception {
     Action action = TestUtils.mockAction(URI_KEY_1, URI_1);
     NetworkInfo info = mockNetworkInfo();
-    when(info.isConnectedOrConnecting()).thenReturn(true);
+    when(info.isConnected()).thenReturn(true);
     NetworkBitmapHunter hunter =
         new NetworkBitmapHunter(picasso, dispatcher, cache, stats, action, downloader);
     assertThat(hunter.shouldRetry(false, info)).isTrue();
@@ -117,18 +119,24 @@ public class NetworkBitmapHunterTest {
     Action action = TestUtils.mockAction(URI_KEY_1, URI_1);
     NetworkBitmapHunter hunter =
         new NetworkBitmapHunter(picasso, dispatcher, cache, stats, action, downloader);
-    hunter.decode(action.getData());
+    hunter.decode(action.getRequest());
     verify(stats).dispatchDownloadFinished(response.contentLength);
   }
 
-  @Test public void unknownContentLengthDoesNotDispatchToStats() throws Exception {
-    Downloader.Response response = new Downloader.Response(mockInputStream(), false, 0);
+  @Test public void unknownContentLengthThrows() throws Exception {
+    InputStream stream = mockInputStream();
+    Downloader.Response response = new Downloader.Response(stream, false, 0);
     when(downloader.load(any(Uri.class), anyBoolean())).thenReturn(response);
     Action action = TestUtils.mockAction(URI_KEY_1, URI_1);
     NetworkBitmapHunter hunter =
         new NetworkBitmapHunter(picasso, dispatcher, cache, stats, action, downloader);
-    hunter.decode(action.getData());
-    verifyZeroInteractions(stats);
+    try {
+      hunter.decode(action.getRequest());
+      fail("Should have thrown IOException.");
+    } catch(IOException expected) {
+      verifyZeroInteractions(stats);
+      verify(stream).close();
+    }
   }
 
   @Test public void cachedResponseDoesNotDispatchToStats() throws Exception {
@@ -137,7 +145,7 @@ public class NetworkBitmapHunterTest {
     Action action = TestUtils.mockAction(URI_KEY_1, URI_1);
     NetworkBitmapHunter hunter =
         new NetworkBitmapHunter(picasso, dispatcher, cache, stats, action, downloader);
-    hunter.decode(action.getData());
+    hunter.decode(action.getRequest());
     verifyZeroInteractions(stats);
   }
 
@@ -152,7 +160,7 @@ public class NetworkBitmapHunterTest {
     NetworkBitmapHunter hunter =
         new NetworkBitmapHunter(picasso, dispatcher, cache, stats, action, bitmapDownloader);
 
-    Bitmap actual = hunter.decode(action.getData());
+    Bitmap actual = hunter.decode(action.getRequest());
     assertThat(actual).isSameAs(expected);
   }
 }

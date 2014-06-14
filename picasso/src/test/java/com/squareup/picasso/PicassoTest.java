@@ -68,7 +68,7 @@ public class PicassoTest {
 
   @Before public void setUp() {
     initMocks(this);
-    picasso = new Picasso(context, dispatcher, cache, listener, transformer, stats, false);
+    picasso = new Picasso(context, dispatcher, cache, listener, transformer, stats, false, false);
   }
 
   @Test public void submitWithNullTargetInvokesDispatcher() throws Exception {
@@ -130,6 +130,19 @@ public class PicassoTest {
     when(hunter.getAction()).thenReturn(action);
     when(hunter.getActions()).thenReturn(Collections.<Action>emptyList());
     picasso.complete(hunter);
+    verify(action).complete(BITMAP_1, MEMORY);
+  }
+
+  @Test public void completeWithReplayDoesNotRemove() throws Exception {
+    Action action = mockAction(URI_KEY_1, URI_1, mockImageViewTarget());
+    when(action.willReplay()).thenReturn(true);
+    BitmapHunter hunter = mockHunter(URI_KEY_1, BITMAP_1, false);
+    when(hunter.getLoadedFrom()).thenReturn(MEMORY);
+    when(hunter.getAction()).thenReturn(action);
+    picasso.enqueueAndSubmit(action);
+    assertThat(picasso.targetToAction).hasSize(1);
+    picasso.complete(hunter);
+    assertThat(picasso.targetToAction).hasSize(1);
     verify(action).complete(BITMAP_1, MEMORY);
   }
 

@@ -24,6 +24,7 @@ import android.os.Looper;
 import android.os.Message;
 import android.os.Process;
 import android.widget.ImageView;
+
 import java.io.File;
 import java.lang.ref.ReferenceQueue;
 import java.util.List;
@@ -36,8 +37,12 @@ import static it.sephiroth.android.library.picasso.Action.RequestWeakReference;
 import static it.sephiroth.android.library.picasso.Dispatcher.HUNTER_BATCH_COMPLETE;
 import static it.sephiroth.android.library.picasso.Dispatcher.REQUEST_COMPLETE;
 import static it.sephiroth.android.library.picasso.Dispatcher.REQUEST_GCED;
+import static it.sephiroth.android.library.picasso.Utils.OWNER_MAIN;
 import static it.sephiroth.android.library.picasso.Utils.THREAD_PREFIX;
+import static it.sephiroth.android.library.picasso.Utils.VERB_COMPLETED;
+import static it.sephiroth.android.library.picasso.Utils.VERB_ERRORED;
 import static it.sephiroth.android.library.picasso.Utils.checkMain;
+import static it.sephiroth.android.library.picasso.Utils.log;
 
 /**
  * Image downloading, transformation, and caching manager.
@@ -87,6 +92,7 @@ public class Picasso {
     };
   }
 
+  static final String TAG = "Picasso";
   static final Handler HANDLER = new Handler(Looper.getMainLooper()) {
     @Override public void handleMessage(Message msg) {
       switch (msg.what) {
@@ -130,10 +136,13 @@ public class Picasso {
   final ReferenceQueue<Object> referenceQueue;
 
   boolean indicatorsEnabled;
+  volatile boolean loggingEnabled;
+
   boolean shutdown;
 
   Picasso(Context context, Dispatcher dispatcher, Cache cache, Listener listener,
-      RequestTransformer requestTransformer, Stats stats, boolean indicatorsEnabled) {
+      RequestTransformer requestTransformer, Stats stats, boolean indicatorsEnabled,
+      boolean loggingEnabled) {
     this.context = context;
     this.dispatcher = dispatcher;
     this.cache = cache;
@@ -143,6 +152,7 @@ public class Picasso {
     this.targetToAction = new WeakHashMap<Object, Action>();
     this.targetToDeferredRequestCreator = new WeakHashMap<ImageView, DeferredRequestCreator>();
     this.indicatorsEnabled = indicatorsEnabled;
+    this.loggingEnabled = loggingEnabled;
     this.referenceQueue = new ReferenceQueue<Object>();
     this.cleanupThread = new CleanupThread(referenceQueue, HANDLER);
     this.cleanupThread.start();
@@ -233,16 +243,19 @@ public class Picasso {
   }
 
   /**
-   * @deprecated Use {@link #areIndicatorsEnabled()} instead.
    * {@code true} if debug display, logging, and statistics are enabled.
+   * <p>
+   * @deprecated Use {@link #areIndicatorsEnabled()} and {@link #isLoggingEnabled()} instead.
    */
   @SuppressWarnings("UnusedDeclaration") @Deprecated public boolean isDebugging() {
-    return areIndicatorsEnabled();
+    return areIndicatorsEnabled() && isLoggingEnabled();
   }
 
   /**
-   * @deprecated Use {@link #setIndicatorsEnabled(boolean)} instead.
    * Toggle whether debug display, logging, and statistics are enabled.
+   * <p>
+   * @deprecated Use {@link #setIndicatorsEnabled(boolean)} and {@link #setLoggingEnabled(boolean)}
+   * instead.
    */
   @SuppressWarnings("UnusedDeclaration") @Deprecated public void setDebugging(boolean debugging) {
     setIndicatorsEnabled(debugging);
@@ -259,7 +272,23 @@ public class Picasso {
   }
 
   /**
+   * Toggle whether debug logging is enabled.
+   * <p>
+   * <b>WARNING:</b> Enabling this will result in excessive object allocation. This should be only
+   * be used for debugging Picasso behavior. Do NOT pass {@code BuildConfig.DEBUG}.
+   */
+  public void setLoggingEnabled(boolean enabled) {
+    loggingEnabled = enabled;
+  }
+
+  /** {@code true} if debug logging is enabled. */
+  public boolean isLoggingEnabled() {
+    return loggingEnabled;
+  }
+
+  /**
    * Creates a {@link StatsSnapshot} of the current stats for this instance.
+   * <p>
    * <b>NOTE:</b> The snapshot may not always be completely up-to-date if requests are still in
    * progress.
    */
@@ -370,14 +399,22 @@ public class Picasso {
     if (action.isCancelled()) {
       return;
     }
-    targetToAction.remove(action.getTarget());
+    if (!action.willReplay()) {
+      targetToAction.remove(action.getTarget());
+    }
     if (result != null) {
       if (from == null) {
         throw new AssertionError("LoadedFrom cannot be null.");
       }
       action.complete(result, from);
+      if (loggingEnabled) {
+        log(OWNER_MAIN, VERB_COMPLETED, action.request.logId(), "from " + from);
+      }
     } else {
       action.error();
+      if (loggingEnabled) {
+        log(OWNER_MAIN, VERB_ERRORED, action.request.logId());
+      }
     }
   }
 
@@ -460,7 +497,11 @@ public class Picasso {
    */
   public static Picasso with(Context context) {
     if (singleton == null) {
-      singleton = new Builder(context).build();
+      synchronized (Picasso.class) {
+        if (singleton == null) {
+          singleton = new Builder(context).build();
+        }
+      }
     }
     return singleton;
   }
@@ -476,6 +517,7 @@ public class Picasso {
     private RequestTransformer transformer;
 
     private boolean indicatorsEnabled;
+    private boolean loggingEnabled;
 
     /** Start building a new {@link Picasso} instance. */
     public Builder(Context context) {
@@ -558,8 +600,20 @@ public class Picasso {
       return indicatorsEnabled(debugging);
     }
 
+    /** Toggle whether to display debug indicators on images. */
     public Builder indicatorsEnabled(boolean enabled) {
       this.indicatorsEnabled = enabled;
+      return this;
+    }
+
+    /**
+     * Toggle whether debug logging is enabled.
+     * <p>
+     * <b>WARNING:</b> Enabling this will result in excessive object allocation. This should be only
+     * be used for debugging purposes. Do NOT pass {@code BuildConfig.DEBUG}.
+     */
+    public Builder loggingEnabled(boolean enabled) {
+      this.loggingEnabled = enabled;
       return this;
     }
 
@@ -585,7 +639,7 @@ public class Picasso {
       Dispatcher dispatcher = new Dispatcher(context, service, HANDLER, downloader, cache, stats);
 
       return new Picasso(context, dispatcher, cache, listener, transformer, stats,
-          indicatorsEnabled);
+          indicatorsEnabled, loggingEnabled);
     }
   }
 

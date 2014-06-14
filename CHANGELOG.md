@@ -1,6 +1,37 @@
 Change Log
 ==========
 
+Version 2.3.2 *(2014-06-05)*
+----------------------------
+
+ * Fix: Correctly invalidate PicassoDrawable for GB.
+ * Fix: Attempt to decode responses with missing `Content-Length` header.
+ * Fix: Prevent race condition to initial `with()` call.
+
+
+Version 2.3.1 *(2014-05-29)*
+----------------------------
+
+ * Fix: Deprecated Response constructor used 0 for content-length.
+ 
+
+Version 2.3.0 *(2014-05-29)*
+----------------------------
+
+ * Requests will now be automatically replayed if they failed due to network errors.
+ * Add API for logging. This is mostly useful for debugging Picasso itself.
+ * Add API for loading images into remote views (notifications and widgets).
+ * Stats now provide download statistics.
+ * Updated to use Pollexor 2.0.
+ * When using OkHttp version 1.6 or newer (including 2.0+) is now required.
+ * `MediaStoreBitmapHunter` now properly returns video thumbnails if requested URI is for a video.
+ * All API calls now properly validate the current thread they must run on.
+ * Performance: Various optimizations for reducing object allocations.
+ * Fix: Stats were incorrectly invoked even if the bitmap failed to decode.
+ * Fix: Handle `null` intent case in network broadcast receiver extras.
+ * Fix: `Target` now correctly invokes bitmap failed if an error drawable or resource is supplied.
+
+
 Version 2.2.0 *(2014-01-31)*
 ----------------------------
 
