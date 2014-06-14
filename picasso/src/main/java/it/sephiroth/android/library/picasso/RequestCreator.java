@@ -218,14 +218,16 @@ public class RequestCreator {
   }
 
   /**
-   * Resizes the image by its maximum side. This means that the image will be resized that its
-   * biggest side will fit the 'targetSide' passed.
-   * @param targetSize the desired target side size
-   * @param onlyIfBigger resize only if bigger, always otherwise
+   * Resized the image based on the bounds specified by {@link #resize(int, int)}
+   * and taking only the largest image side into account.
+   * This means that if 'resize(300,200)' is called and the image size is 800x600,
+   * then the image will be resized to 300x225 because the largest side is 800, which
+   * will be resized to 300 and the height, which is 600, will be resized according to
+   * its original size ratio.
    * @return
    */
-  public RequestCreator resizeByMaxSide(int targetSize, boolean onlyIfBigger) {
-    data.resizeByMaxSide(targetSize, onlyIfBigger);
+  public RequestCreator resizeByMaxSide() {
+    data.resizeByMaxSide();
     return this;
   }
 

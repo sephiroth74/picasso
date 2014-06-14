@@ -77,7 +77,8 @@ final class SampleGridViewAdapter extends BaseAdapter {
         .error(R.drawable.error) //
         .config(Bitmap.Config.RGB_565)
         .skipMemoryCache()
-        .resizeByMaxSide(200,true)
+        .resize(300,300,true)
+        .centerInside()
         .into(view, new Callback() {
           @Override
           public void onSuccess() {

@@ -310,12 +310,11 @@ public final class Request {
     }
 
     /** Resizes the image by its max side */
-    public Builder resizeByMaxSide(int maxSize, boolean onlyIfBigger) {
+    public Builder resizeByMaxSide() {
       if (centerInside || centerCrop) {
         throw new IllegalStateException("Resize by max side cannot be used with centerCrop or " +
             "centerInside");
       }
-      this.targetWidth = maxSize;
       this.resizeByMaxSide = true;
       return this;
     }
@@ -323,8 +322,6 @@ public final class Request {
     /** Clear the center crop transformation flag, if set. */
     public Builder clearResizeByMaxSide() {
       resizeByMaxSide = false;
-      targetWidth = 0;
-      targetHeight = 0;
       return this;
     }
 
@@ -456,12 +453,25 @@ public final class Request {
       if (centerInside && centerCrop) {
         throw new IllegalStateException("Center crop and center inside can not be used together.");
       }
+      if (centerInside && resizeByMaxSide) {
+        throw new IllegalStateException("Center Inside and resize by max side can not be used together.");
+      }
+      if (centerCrop && resizeByMaxSide) {
+        throw new IllegalStateException("Center crop and resize by max side can not be used together.");
+      }
+
       if (centerCrop && targetWidth == 0) {
         throw new IllegalStateException("Center crop requires calling resize.");
       }
+
       if (centerInside && targetWidth == 0) {
         throw new IllegalStateException("Center inside requires calling resize.");
       }
+
+      if(resizeByMaxSide && targetWidth == 0) {
+        throw new IllegalStateException("Resize by max side requires calling resize.");
+      }
+
       return new Request(uri, resourceId, transformations, targetWidth, targetHeight,
           resizeOnlyIfBigger, centerCrop, centerInside,
           resizeByMaxSide,

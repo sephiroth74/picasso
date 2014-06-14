@@ -467,7 +467,6 @@ abstract class BitmapHunter implements Runnable {
     Matrix matrix = new Matrix();
 
     if (data.needsMatrixTransform()) {
-      int targetSize = data.targetWidth;
       int targetWidth = data.targetWidth;
       int targetHeight = data.targetHeight;
       boolean resizeOnlyIfBigger = data.resizeOnlyIfBigger;
@@ -508,18 +507,16 @@ abstract class BitmapHunter implements Runnable {
             && (inWidth > targetWidth || inHeight > targetHeight))) {
           matrix.preScale(scale, scale);
         }
-      } else if (data.resizeByMaxSide && (targetSize != inWidth || targetSize != inHeight)) {
+      } else if (data.resizeByMaxSide && (targetWidth != inWidth || targetHeight != inHeight)) {
         float sx;
 
         if(inWidth > inHeight){
-          sx = targetSize / (float) inWidth;
+          sx = targetWidth / (float) inWidth;
         } else {
-          sx = targetSize / (float) inHeight;
+          sx = targetHeight / (float) inHeight;
         }
 
-
-        if (!resizeOnlyIfBigger || (resizeOnlyIfBigger
-            && (sx < 1.0))) {
+        if (!resizeOnlyIfBigger || (resizeOnlyIfBigger && (sx < 1.0))) {
           matrix.preScale(sx, sx);
         }
 
