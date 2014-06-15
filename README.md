@@ -52,5 +52,5 @@ License
     limitations under the License.
 
 
- [1]: http://square.github.io/picasso/
+ [1]: http://sephiroth74.github.io/picasso/
  [2]: http://repository.sonatype.org/service/local/artifact/maven/redirect?r=central-proxy&g=it.sephiroth.android.library.picasso&a=picasso&v=LATEST
