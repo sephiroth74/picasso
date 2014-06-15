@@ -19,6 +19,7 @@ android {
         versionCode 1
         versionName version
     }
+
     buildTypes {
         release {
             runProguard false
