@@ -53,4 +53,4 @@ License
 
 
  [1]: http://sephiroth74.github.io/picasso/
- [2]: http://repository.sonatype.org/service/local/artifact/maven/redirect?r=central-proxy&g=it.sephiroth.android.library.picasso&a=picasso&v=LATEST
+ [2]: https://repository.sonatype.org/#nexus-search;quick~it.sephiroth.android.library.picasso
