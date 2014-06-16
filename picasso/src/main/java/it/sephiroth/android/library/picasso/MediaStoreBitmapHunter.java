@@ -33,6 +33,9 @@ import static android.provider.MediaStore.Video;
 import static it.sephiroth.android.library.picasso.MediaStoreBitmapHunter.PicassoKind.FULL;
 import static it.sephiroth.android.library.picasso.MediaStoreBitmapHunter.PicassoKind.MICRO;
 import static it.sephiroth.android.library.picasso.MediaStoreBitmapHunter.PicassoKind.MINI;
+import static it.sephiroth.android.library.picasso.Utils.OWNER_HUNTER;
+import static it.sephiroth.android.library.picasso.Utils.VERB_DECODED;
+import static it.sephiroth.android.library.picasso.Utils.log;
 
 class MediaStoreBitmapHunter extends ContentStreamBitmapHunter {
   private static final String[] CONTENT_ORIENTATION = new String[] {
@@ -51,7 +54,7 @@ class MediaStoreBitmapHunter extends ContentStreamBitmapHunter {
     boolean isVideo = mimeType != null && mimeType.startsWith("video/");
 
     if (data.hasSize()) {
-      PicassoKind picassoKind = getPicassoKind(data.targetWidth, data.targetHeight);
+      PicassoKind picassoKind = getPicassoKind(data);
       if (!isVideo && picassoKind == FULL) {
         return super.decode(data);
       }
@@ -61,8 +64,7 @@ class MediaStoreBitmapHunter extends ContentStreamBitmapHunter {
       BitmapFactory.Options options = createBitmapOptions(data);
       options.inJustDecodeBounds = true;
 
-      calculateInSampleSize(data.targetWidth, data.targetHeight, picassoKind.width,
-          picassoKind.height, options);
+      calculateInSampleSize(data, picassoKind.width, picassoKind.height, options);
 
       Bitmap result;
 
@@ -72,8 +74,19 @@ class MediaStoreBitmapHunter extends ContentStreamBitmapHunter {
         int kind = (picassoKind == FULL) ? Video.Thumbnails.MINI_KIND : picassoKind.androidKind;
         result = Video.Thumbnails.getThumbnail(contentResolver, id, kind, options);
       } else {
+        if(picassoKind != FULL) {
+          // of mini or micro is requested, there's no need
+          // to scale the bitmap on decoding
+          options.inSampleSize = 1;
+        }
         result =
             Images.Thumbnails.getThumbnail(contentResolver, id, picassoKind.androidKind, options);
+        if(picasso.loggingEnabled){
+          if (null != result) {
+            log(OWNER_HUNTER, VERB_DECODED, "decoded size: " + result.getWidth() + "x" +
+                result.getHeight());
+          }
+        }
       }
 
       if (result != null) {
@@ -84,7 +97,9 @@ class MediaStoreBitmapHunter extends ContentStreamBitmapHunter {
     return super.decode(data);
   }
 
-  static PicassoKind getPicassoKind(int targetWidth, int targetHeight) {
+  static PicassoKind getPicassoKind(Request data) {
+    final int targetWidth = data.targetWidth;
+    final int targetHeight = data.resizeByMaxSide ? data.targetWidth : data.targetHeight;
     if (targetWidth <= MICRO.width && targetHeight <= MICRO.height) {
       return MICRO;
     } else if (targetWidth <= MINI.width && targetHeight <= MINI.height) {

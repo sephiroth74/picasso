@@ -379,10 +379,14 @@ abstract class BitmapHunter implements Runnable {
   }
 
   static void calculateInSampleSize(Request data, BitmapFactory.Options options) {
+    calculateInSampleSize(data, options.outWidth, options.outHeight, options);
+  }
+
+  static void calculateInSampleSize(Request data, int width, int height, BitmapFactory.Options options) {
     if (data.resizeByMaxSide) {
-      calculateInSampleSize(data.targetWidth, data.targetWidth, options.outWidth, options.outHeight, options);
+      calculateInSampleSize(data.targetWidth, data.targetWidth, width, height, options);
     } else {
-      calculateInSampleSize(data.targetWidth, data.targetHeight, options.outWidth, options.outHeight, options);
+      calculateInSampleSize(data.targetWidth, data.targetHeight, width, height, options);
     }
   }
 
@@ -390,7 +394,7 @@ abstract class BitmapHunter implements Runnable {
     calculateInSampleSize(reqWidth, reqHeight, options.outWidth, options.outHeight, options);
   }
 
-  static void calculateInSampleSize(int reqWidth, int reqHeight, int width, int height,
+  private static void calculateInSampleSize(int reqWidth, int reqHeight, int width, int height,
       BitmapFactory.Options options) {
     int sampleSize = 1;
     if (height > reqHeight || width > reqWidth) {
