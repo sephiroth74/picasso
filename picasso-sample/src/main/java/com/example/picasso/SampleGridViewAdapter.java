@@ -2,6 +2,7 @@ package com.example.picasso;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
@@ -21,6 +22,7 @@ import static android.widget.ImageView.ScaleType.CENTER_INSIDE;
 final class SampleGridViewAdapter extends BaseAdapter {
   private final Context context;
   private final List<String> urls = new ArrayList<String>();
+  private final DisplayMetrics metrics;
 
   public SampleGridViewAdapter(Context context) {
     this.context = context;
@@ -29,18 +31,31 @@ final class SampleGridViewAdapter extends BaseAdapter {
     Collections.addAll(urls, Data.URLS);
     Collections.shuffle(urls);
 
+    //urls.add(0, "content://media/external/images/media/21");
+    //urls.add(3, "http://lh3.googleusercontent.com/-AIS_50f8nC4/UlBc_sxqG4I/AAAAAAACJ08/79AXSoDfYnY/w1208-h1812-no/DSC_0535.jpg");
+//    urls.add(0, "content://media/external/images/media/21");
+//    urls.add(0, "content://media/external/images/media/20");
+//    urls.add(0, "content://media/external/images/media/19");
+//    urls.add(0, "content://media/external/images/media/18");
+//    urls.add(0, "content://media/external/images/media/17");
+//    urls.add(0, "content://media/external/images/media/16");
+//    urls.add(0, "content://media/external/images/media/15");
+//    urls.add(0, "content://media/external/images/media/14");
+//    urls.add(0, "content://media/external/images/media/13");
+//    urls.add(0, "content://media/external/images/media/12");
+//    urls.add(0, "content://media/external/images/media/11");
+//    urls.add(0, "content://media/external/images/media/10");
+//    urls.add(0, "content://media/external/images/media/9");
+//    urls.add(0, "content://media/external/images/media/8");
+//    urls.add(0, "content://media/external/images/media/7");
+//    urls.add(0, "content://media/external/images/media/6");
+//    urls.add(0, "content://media/external/images/media/5");
+//    urls.add(0, "content://media/external/images/media/4");
 
-    // Triple up the list.
-    ArrayList<String> copy = new ArrayList<String>(urls);
-    urls.addAll(copy);
-    urls.addAll(copy);
-    urls.add(3, "http://lh3.googleusercontent.com/-AIS_50f8nC4/UlBc_sxqG4I/AAAAAAACJ08/79AXSoDfYnY/w1208-h1812-no/DSC_0535.jpg");
-
-    //Picasso.with(context).setIndicatorsEnabled(true);
     Picasso.with(context).setUseBatch(false);
     Picasso.with(context).setLoggingEnabled(true);
 
-    DisplayMetrics metrics = context.getResources().getDisplayMetrics();
+    metrics = context.getResources().getDisplayMetrics();
     Log.e("picasso", "density: " + metrics.density);
     Log.e("picasso", "screen inches: " + getScreenInches(context));
     Log.e("picasso", "screen pixels: " + metrics.widthPixels + "x" + metrics.heightPixels);
@@ -57,7 +72,7 @@ final class SampleGridViewAdapter extends BaseAdapter {
     final SquaredImageView view;
     if (convertView == null) {
       view = new SquaredImageView(context);
-      view.setScaleType(CENTER_INSIDE);
+      view.setScaleType(CENTER_CROP);
     } else {
       view = (SquaredImageView) convertView;
     }
@@ -77,14 +92,16 @@ final class SampleGridViewAdapter extends BaseAdapter {
         .error(R.drawable.error) //
         .config(Bitmap.Config.RGB_565)
         .skipMemoryCache()
-        .resize(300,300,true)
-        .centerInside()
+        .resize(metrics.widthPixels/3, metrics.widthPixels/3, true)
+        .centerCrop()
         .into(view, new Callback() {
           @Override
           public void onSuccess() {
+            BitmapDrawable d = (BitmapDrawable) view.getDrawable();
+            Bitmap bitmap = d.getBitmap();
             Log.d("picasso",
-                "bitmap(" + position + "): " + view.getDrawable().getIntrinsicWidth() + "x" + view.getDrawable().getIntrinsicHeight() +
-                    ", image: " + view.getMeasuredWidth() + "x" + view.getMeasuredHeight()
+                "bitmap(" + position + "): " + bitmap.getWidth() + "x" + bitmap.getHeight() +
+                    ", view: " + view.getMeasuredWidth() + "x" + view.getMeasuredHeight()
             );
           }
 
