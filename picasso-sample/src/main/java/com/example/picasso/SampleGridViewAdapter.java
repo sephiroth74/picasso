@@ -28,12 +28,21 @@ final class SampleGridViewAdapter extends BaseAdapter {
     this.context = context;
 
     // Ensure we get a different ordering of images on each run.
-    Collections.addAll(urls, Data.URLS);
-    Collections.shuffle(urls);
+    //Collections.addAll(urls, Data.URLS);
+    //Collections.shuffle(urls);
 
     //urls.add(0, "content://media/external/images/media/21");
     //urls.add(3, "http://lh3.googleusercontent.com/-AIS_50f8nC4/UlBc_sxqG4I/AAAAAAACJ08/79AXSoDfYnY/w1208-h1812-no/DSC_0535.jpg");
-//    urls.add(0, "content://media/external/images/media/21");
+//    urls.add(0, "content://media/external/images/media/657");
+//    urls.add(0, "content://media/external/images/media/658");
+//    urls.add(0, "content://media/external/images/media/659");
+//    urls.add(0, "content://media/external/images/media/660");
+//    urls.add(0, "content://media/external/images/media/661");
+//    urls.add(0, "content://media/external/images/media/662");
+//    urls.add(0, "content://media/external/images/media/663");
+//    urls.add(0, "content://media/external/images/media/664");
+//    urls.add(0, "content://media/external/images/media/665");
+//    urls.add(0, "content://media/external/images/media/666");
 //    urls.add(0, "content://media/external/images/media/20");
 //    urls.add(0, "content://media/external/images/media/19");
 //    urls.add(0, "content://media/external/images/media/18");
