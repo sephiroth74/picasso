@@ -171,7 +171,7 @@ public class RequestCreator {
 
   /**
    * Attempt to resize the image to fit exactly into the target {@link ImageView}'s bounds. This
-   * will result in delayed execution of the request until the {@link ImageView} has been measured.
+   * will result in delayed execution of the request until the {@link ImageView} has been laid out.
    * <p>
    * <em>Note:</em> This method works only when your target is an {@link ImageView}.
    */
@@ -602,14 +602,14 @@ public class RequestCreator {
       if (data.hasSize()) {
         throw new IllegalStateException("Fit cannot be used with resize.");
       }
-      int measuredWidth = target.getMeasuredWidth();
-      int measuredHeight = target.getMeasuredHeight();
-      if (measuredWidth == 0 || measuredHeight == 0) {
+      int width = target.getWidth();
+      int height = target.getHeight();
+      if (width == 0 || height == 0) {
         setPlaceholder(target, placeholderResId, placeholderDrawable);
         picasso.defer(target, new DeferredRequestCreator(this, target, callback));
         return;
       }
-      data.resize(measuredWidth, measuredHeight, false);
+      data.resize(width, height, false);
     }
 
     Request request = createRequest(started);
@@ -657,8 +657,8 @@ public class RequestCreator {
       // If the request was changed, copy over the id and timestamp from the original.
       transformed.id = id;
       transformed.started = started;
-      if (loggingEnabled) {
 
+      if (loggingEnabled) {
         log(OWNER_MAIN, VERB_CHANGED, transformed.logId(), "into " + transformed);
       }
     }
