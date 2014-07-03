@@ -28,41 +28,16 @@ final class SampleGridViewAdapter extends BaseAdapter {
     this.context = context;
 
     // Ensure we get a different ordering of images on each run.
-    //Collections.addAll(urls, Data.URLS);
-    //Collections.shuffle(urls);
-
-    //urls.add(0, "content://media/external/images/media/21");
-    //urls.add(3, "http://lh3.googleusercontent.com/-AIS_50f8nC4/UlBc_sxqG4I/AAAAAAACJ08/79AXSoDfYnY/w1208-h1812-no/DSC_0535.jpg");
-//    urls.add(0, "content://media/external/images/media/657");
-//    urls.add(0, "content://media/external/images/media/658");
-//    urls.add(0, "content://media/external/images/media/659");
-//    urls.add(0, "content://media/external/images/media/660");
-//    urls.add(0, "content://media/external/images/media/661");
-//    urls.add(0, "content://media/external/images/media/662");
-//    urls.add(0, "content://media/external/images/media/663");
-//    urls.add(0, "content://media/external/images/media/664");
-//    urls.add(0, "content://media/external/images/media/665");
-//    urls.add(0, "content://media/external/images/media/666");
-//    urls.add(0, "content://media/external/images/media/20");
-//    urls.add(0, "content://media/external/images/media/19");
-//    urls.add(0, "content://media/external/images/media/18");
-//    urls.add(0, "content://media/external/images/media/17");
-//    urls.add(0, "content://media/external/images/media/16");
-//    urls.add(0, "content://media/external/images/media/15");
-//    urls.add(0, "content://media/external/images/media/14");
-//    urls.add(0, "content://media/external/images/media/13");
-//    urls.add(0, "content://media/external/images/media/12");
-//    urls.add(0, "content://media/external/images/media/11");
-//    urls.add(0, "content://media/external/images/media/10");
-//    urls.add(0, "content://media/external/images/media/9");
-//    urls.add(0, "content://media/external/images/media/8");
-//    urls.add(0, "content://media/external/images/media/7");
-//    urls.add(0, "content://media/external/images/media/6");
-//    urls.add(0, "content://media/external/images/media/5");
-//    urls.add(0, "content://media/external/images/media/4");
+    Collections.addAll(urls, Data.URLS);
+    Collections.addAll(urls, Data.URLS);
+    Collections.addAll(urls, Data.URLS);
+    Collections.addAll(urls, Data.URLS);
+    Collections.addAll(urls, Data.URLS);
+    Collections.addAll(urls, Data.URLS);
+    Collections.shuffle(urls);
 
     Picasso.with(context).setUseBatch(false);
-    Picasso.with(context).setLoggingEnabled(true);
+    Picasso.with(context).setLoggingEnabled(false);
 
     metrics = context.getResources().getDisplayMetrics();
     Log.e("picasso", "density: " + metrics.density);
@@ -106,12 +81,6 @@ final class SampleGridViewAdapter extends BaseAdapter {
         .into(view, new Callback() {
           @Override
           public void onSuccess() {
-            BitmapDrawable d = (BitmapDrawable) view.getDrawable();
-            Bitmap bitmap = d.getBitmap();
-            Log.d("picasso",
-                "bitmap(" + position + "): " + bitmap.getWidth() + "x" + bitmap.getHeight() +
-                    ", view: " + view.getMeasuredWidth() + "x" + view.getMeasuredHeight()
-            );
           }
 
           @Override
