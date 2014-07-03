@@ -16,6 +16,13 @@ android {
         versionName version
     }
 
+    lintOptions {
+        disable 'UnusedAttribute', 'OldTargetApi', 'GradleOverrides', 'GradleDependency', 'SpUsage', 'UseCompoundDrawables', 'UnusedResources', 'NewApi'
+        textReport true
+        ignoreWarnings true
+        textOutput 'lint-output.txt'
+    }
+
     buildTypes {
         release {
             runProguard false
