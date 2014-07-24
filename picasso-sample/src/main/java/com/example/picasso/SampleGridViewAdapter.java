@@ -3,6 +3,7 @@ package com.example.picasso;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
+import android.net.Uri;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
@@ -19,13 +20,16 @@ import it.sephiroth.android.library.picasso.Picasso;
 import static android.widget.ImageView.ScaleType.CENTER_CROP;
 import static android.widget.ImageView.ScaleType.CENTER_INSIDE;
 
-final class SampleGridViewAdapter extends BaseAdapter {
+final class SampleGridViewAdapter extends BaseAdapter implements Picasso.Listener {
   private final Context context;
   private final List<String> urls = new ArrayList<String>();
   private final DisplayMetrics metrics;
+  private final Picasso mPicasso;
 
   public SampleGridViewAdapter(Context context) {
     this.context = context;
+
+	mPicasso = new Picasso.Builder(context).listener(this).build();
 
     // Ensure we get a different ordering of images on each run.
     Collections.addAll(urls, Data.URLS);
@@ -36,8 +40,8 @@ final class SampleGridViewAdapter extends BaseAdapter {
     Collections.addAll(urls, Data.URLS);
     Collections.shuffle(urls);
 
-    Picasso.with(context).setUseBatch(false);
-    Picasso.with(context).setLoggingEnabled(false);
+	mPicasso.setUseBatch(false);
+	mPicasso.setLoggingEnabled(false);
 
     metrics = context.getResources().getDisplayMetrics();
     Log.e("picasso", "density: " + metrics.density);
@@ -66,28 +70,28 @@ final class SampleGridViewAdapter extends BaseAdapter {
     // Get the image URL for the current position.
     String url = getItem(position);
 
-    Picasso.with(context).cancelRequest(view);
-
+	mPicasso.cancelRequest(view);
 
     // Trigger the download of the URL asynchronously into the image view.
-    Picasso.with(context) //
+	mPicasso //
         .load(url) //
-//        .placeholder(R.drawable.placeholder)
+        .placeholder(R.drawable.placeholder)
         .error(R.drawable.error) //
         .config(Bitmap.Config.RGB_565)
         .skipMemoryCache()
         .resize(metrics.widthPixels/3, metrics.widthPixels/3, true)
         .centerCrop()
-        .into(view, new Callback() {
-          @Override
-          public void onSuccess() {
-          }
+        .into(
+	        view, new Callback() {
+		        @Override
+		        public void onSuccess() {
+		        }
 
-          @Override
-          public void onError() {
-//            Log.e("adapter", "onError");
-          }
-        });
+		        @Override
+		        public void onError() {
+		        }
+	        }
+        );
 
     return view;
   }
@@ -103,4 +107,10 @@ final class SampleGridViewAdapter extends BaseAdapter {
   @Override public long getItemId(int position) {
     return position;
   }
+
+	@Override
+	public void onImageLoadFailed(
+		final Picasso picasso, final Uri uri, final Exception exception) {
+		Log.w("Picasso", "onImageLoadFailed: " + uri + ", exception: ", exception);
+	}
 }

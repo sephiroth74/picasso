@@ -76,14 +76,15 @@ import static org.robolectric.Robolectric.shadowOf;
 public class BitmapHunterTest {
 
   @Mock Context context;
-  @Mock Picasso picasso;
   @Mock Cache cache;
   @Mock Stats stats;
   @Mock Dispatcher dispatcher;
   @Mock Downloader downloader;
+  Picasso picasso;
 
   @Before public void setUp() throws Exception {
     initMocks(this);
+    picasso = mockPicasso();
   }
 
   @Test public void nullDecodeResponseIsError() throws Exception {
@@ -384,6 +385,12 @@ public class BitmapHunterTest {
     final BitmapFactory.Options justBounds = new BitmapFactory.Options();
     justBounds.inJustDecodeBounds = true;
     assertThat(requiresInSampleSize(justBounds)).isTrue();
+  }
+
+  @Test public void calculateInSampleSizeNoResize() {
+    final BitmapFactory.Options options = new BitmapFactory.Options();
+    calculateInSampleSize(100, 100, 150, 150, options);
+    assertThat(options.inSampleSize).isEqualTo(1);
   }
 
   @Test public void nullBitmapOptionsIfNoResizing() {
