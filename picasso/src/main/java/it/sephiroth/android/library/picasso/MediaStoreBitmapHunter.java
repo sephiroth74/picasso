@@ -79,8 +79,14 @@ class MediaStoreBitmapHunter extends ContentStreamBitmapHunter {
           // to scale the bitmap on decoding
           options.inSampleSize = 1;
         }
-        result =
-            Images.Thumbnails.getThumbnail(contentResolver, id, picassoKind.androidKind, options);
+
+	    try {
+		  result = Images.Thumbnails.getThumbnail(contentResolver, id, picassoKind.androidKind, options);
+	    } catch (NullPointerException e) {
+		  // ThumbnailUtils throws a NullPointer sometimes
+		  e.printStackTrace();
+		  return super.decode(data);
+	    }
         if(picasso.loggingEnabled){
           if (null != result) {
             log(OWNER_HUNTER, VERB_DECODED, "decoded size: " + result.getWidth() + "x" +
