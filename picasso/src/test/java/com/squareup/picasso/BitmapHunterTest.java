@@ -387,6 +387,12 @@ public class BitmapHunterTest {
     assertThat(requiresInSampleSize(justBounds)).isTrue();
   }
 
+  @Test public void calculateInSampleSizeNoResize() {
+    final BitmapFactory.Options options = new BitmapFactory.Options();
+    calculateInSampleSize(100, 100, 150, 150, options);
+    assertThat(options.inSampleSize).isEqualTo(1);
+  }
+
   @Test public void nullBitmapOptionsIfNoResizing() {
     // No resize must return no bitmap options
     final Request noResize = new Request.Builder(URI_1).build();
