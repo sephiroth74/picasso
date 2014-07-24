@@ -21,6 +21,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.RemoteViews;
 
@@ -602,8 +603,16 @@ public class RequestCreator {
       if (data.hasSize()) {
         throw new IllegalStateException("Fit cannot be used with resize.");
       }
-      int width = target.getWidth();
-      int height = target.getHeight();
+
+	  int width, height;
+	  if (target.getVisibility() == View.GONE) {
+		width = target.getMeasuredWidth();
+		height = target.getMeasuredHeight();
+	  } else {
+		width = target.getWidth();
+		height = target.getHeight();
+	  }
+
       if (width == 0 || height == 0) {
         setPlaceholder(target, placeholderResId, placeholderDrawable);
         picasso.defer(target, new DeferredRequestCreator(this, target, callback));
