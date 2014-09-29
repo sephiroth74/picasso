@@ -81,7 +81,7 @@ public class RemoteViewsActionTest {
   static class TestableRemoteViewsAction extends RemoteViewsAction {
     TestableRemoteViewsAction(Picasso picasso, Request data, RemoteViews remoteViews, int viewId,
         int errorResId, boolean skipCache, String key, String tag) {
-      super(picasso, data, remoteViews, viewId, errorResId, skipCache, key, tag);
+      super(picasso, data, remoteViews, viewId, errorResId, skipCache, key, tag, 200);
     }
 
     @Override void update() {

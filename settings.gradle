@@ -1,2 +1,2 @@
 include ':picasso'
-//include ':picasso-sample'
+include ':picasso-sample'

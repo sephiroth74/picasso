@@ -29,3 +29,4 @@ gen-external-apklibs
 tmp
 
 .DS_Store
+.gradle

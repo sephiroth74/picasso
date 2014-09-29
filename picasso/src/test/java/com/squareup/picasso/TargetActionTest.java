@@ -43,7 +43,8 @@ public class TargetActionTest {
   @Test(expected = AssertionError.class)
   public void throwsErrorWithNullResult() throws Exception {
     TargetAction request =
-        new TargetAction(mock(Picasso.class), mockTarget(), null, false, 0, null, URI_KEY_1, null);
+        new TargetAction(mock(Picasso.class), mockTarget(), null, false, 0, null, URI_KEY_1, null,
+                200);
     request.complete(null, MEMORY);
   }
 
@@ -51,7 +52,7 @@ public class TargetActionTest {
   public void invokesSuccessIfTargetIsNotNull() throws Exception {
     Target target = mockTarget();
     TargetAction request =
-        new TargetAction(mock(Picasso.class), target, null, false, 0, null, URI_KEY_1, null);
+        new TargetAction(mock(Picasso.class), target, null, false, 0, null, URI_KEY_1, null, 200);
     request.complete(BITMAP_3, MEMORY);
     verify(target).onBitmapLoaded(BITMAP_3, MEMORY);
   }
@@ -61,7 +62,8 @@ public class TargetActionTest {
     Drawable errorDrawable = mock(Drawable.class);
     Target target = mockTarget();
     TargetAction request =
-        new TargetAction(mock(Picasso.class), target, null, false, 0, errorDrawable, URI_KEY_1, null);
+        new TargetAction(mock(Picasso.class), target, null, false, 0, errorDrawable, URI_KEY_1,
+                null, 200);
     request.error();
     verify(target).onBitmapFailed(errorDrawable);
   }
@@ -76,7 +78,7 @@ public class TargetActionTest {
             mock(Stats.class), false, false);
     Resources res = mock(Resources.class);
     TargetAction request =
-        new TargetAction(picasso, target, null, false, RESOURCE_ID_1, null, URI_KEY_1, null);
+        new TargetAction(picasso, target, null, false, RESOURCE_ID_1, null, URI_KEY_1, null, 200);
 
     when(context.getResources()).thenReturn(res);
     when(res.getDrawable(RESOURCE_ID_1)).thenReturn(errorDrawable);
@@ -100,7 +102,7 @@ public class TargetActionTest {
     };
     Picasso picasso = mock(Picasso.class);
 
-    TargetAction tr = new TargetAction(picasso, bad, null, false, 0, null, URI_KEY_1, null);
+    TargetAction tr = new TargetAction(picasso, bad, null, false, 0, null, URI_KEY_1, null, 200);
     try {
       tr.complete(BITMAP_1, MEMORY);
       fail();

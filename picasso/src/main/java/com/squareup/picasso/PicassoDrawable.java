@@ -43,13 +43,13 @@ final class PicassoDrawable extends BitmapDrawable {
    * image.
    */
   static void setBitmap(ImageView target, Context context, Bitmap bitmap,
-      Picasso.LoadedFrom loadedFrom, boolean noFade, boolean debugging) {
+      Picasso.LoadedFrom loadedFrom, long fadeTime, boolean debugging) {
     Drawable placeholder = target.getDrawable();
     if (placeholder instanceof AnimationDrawable) {
       ((AnimationDrawable) placeholder).stop();
     }
     PicassoDrawable drawable =
-        new PicassoDrawable(context, bitmap, placeholder, loadedFrom, noFade, debugging);
+        new PicassoDrawable(context, bitmap, placeholder, loadedFrom, fadeTime, debugging);
     target.setImageDrawable(drawable);
   }
 
@@ -60,7 +60,7 @@ final class PicassoDrawable extends BitmapDrawable {
   static void setPlaceholder(ImageView target, int placeholderResId, Drawable placeholderDrawable) {
     if (placeholderResId != 0) {
       target.setImageResource(placeholderResId);
-    } else {
+    } else if (null != placeholderDrawable) {
       target.setImageDrawable(placeholderDrawable);
     }
     if (target.getDrawable() instanceof AnimationDrawable) {
@@ -77,17 +77,19 @@ final class PicassoDrawable extends BitmapDrawable {
   long startTimeMillis;
   boolean animating;
   int alpha = 0xFF;
+  long fadeTime;
 
   PicassoDrawable(Context context, Bitmap bitmap, Drawable placeholder,
-      Picasso.LoadedFrom loadedFrom, boolean noFade, boolean debugging) {
+      Picasso.LoadedFrom loadedFrom, long fadeTime, boolean debugging) {
     super(context.getResources(), bitmap);
 
     this.debugging = debugging;
     this.density = context.getResources().getDisplayMetrics().density;
 
     this.loadedFrom = loadedFrom;
+    this.fadeTime = fadeTime;
 
-    boolean fade = loadedFrom != MEMORY && !noFade;
+    boolean fade = loadedFrom != MEMORY && fadeTime > 0;
     if (fade) {
       this.placeholder = placeholder;
       animating = true;
@@ -99,7 +101,7 @@ final class PicassoDrawable extends BitmapDrawable {
     if (!animating) {
       super.draw(canvas);
     } else {
-      float normalized = (SystemClock.uptimeMillis() - startTimeMillis) / FADE_DURATION;
+      float normalized = (float) (SystemClock.uptimeMillis() - startTimeMillis) / fadeTime;
       if (normalized >= 1f) {
         animating = false;
         placeholder = null;
