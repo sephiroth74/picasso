@@ -86,6 +86,7 @@ public class RequestCreator {
   private Drawable placeholderDrawable;
   private Drawable errorDrawable;
   private Object tag;
+  private long delayMillis;
 
   RequestCreator(Picasso picasso, Uri uri, int resourceId) {
     if (picasso.shutdown) {
@@ -310,6 +311,16 @@ public class RequestCreator {
   }
 
   /**
+   * Delay the loader
+   * @param millis
+   * @return
+   */
+  public RequestCreator withDelay(long millis) {
+    delayMillis = millis;
+    return this;
+  }
+
+  /**
    * Synchronously fulfill this request. Must not be called from the main thread.
    * <p>
    * <em>Note</em>: The result of this operation is not cached in memory because the underlying
@@ -355,7 +366,7 @@ public class RequestCreator {
       String key = createKey(request, new StringBuilder());
 
       Action action = new FetchAction(picasso, request, skipMemoryCache, key, tag, fadeTime);
-      picasso.submit(action);
+      picasso.submit(action, delayMillis);
     }
   }
 
@@ -442,7 +453,7 @@ public class RequestCreator {
     Action action =
         new TargetAction(picasso, target, request, skipMemoryCache, errorResId, errorDrawable,
             requestKey, tag, fadeTime);
-    picasso.enqueueAndSubmit(action);
+    picasso.enqueueAndSubmit(action, delayMillis);
   }
 
   /**
@@ -581,7 +592,7 @@ public class RequestCreator {
         new ImageViewAction(picasso, target, request, skipMemoryCache, fadeTime, errorResId,
             errorDrawable, requestKey, tag, callback);
 
-    picasso.enqueueAndSubmit(action);
+    picasso.enqueueAndSubmit(action, delayMillis);
   }
 
   /** Create the request optionally passing it through the request transformer. */
@@ -624,6 +635,6 @@ public class RequestCreator {
       action.setImageResource(placeholderResId);
     }
 
-    picasso.enqueueAndSubmit(action);
+    picasso.enqueueAndSubmit(action, delayMillis);
   }
 }

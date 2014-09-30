@@ -123,8 +123,12 @@ class Dispatcher {
     receiver.unregister();
   }
 
-  void dispatchSubmit(Action action) {
-    handler.sendMessage(handler.obtainMessage(REQUEST_SUBMIT, action));
+  void dispatchSubmit(Action<?> action, long delayMillis) {
+    if (delayMillis > 0) {
+      handler.sendMessageDelayed(handler.obtainMessage(REQUEST_SUBMIT, action), delayMillis);
+    } else {
+      handler.sendMessage(handler.obtainMessage(REQUEST_SUBMIT, action));
+    }
   }
 
   void dispatchCancel(Action action) {
@@ -136,7 +140,15 @@ class Dispatcher {
   }
 
   void dispatchResumeTag(Object tag) {
-    handler.sendMessage(handler.obtainMessage(TAG_RESUME, tag));
+    dispatchResumeTag(tag, 0);
+  }
+
+  void dispatchResumeTag(Object tag, long millis) {
+    if (millis > 0) {
+      handler.sendMessageDelayed(handler.obtainMessage(TAG_RESUME, tag), millis);
+    } else {
+      handler.sendMessage(handler.obtainMessage(TAG_RESUME, tag));
+    }
   }
 
   void dispatchComplete(BitmapHunter hunter) {

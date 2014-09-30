@@ -26,6 +26,8 @@ final class SampleGridViewAdapter extends BaseAdapter {
     ArrayList<String> copy = new ArrayList<String>(urls);
     urls.addAll(copy);
     urls.addAll(copy);
+
+    Picasso.with(context).setLoggingEnabled(true);
   }
 
   @Override public View getView(int position, View convertView, ViewGroup parent) {
@@ -45,7 +47,7 @@ final class SampleGridViewAdapter extends BaseAdapter {
         .error(R.drawable.error) //
         .fit() //
         .tag(context) //
-        .fade(0)
+        .fade(200)
         .into(view);
 
     return view;

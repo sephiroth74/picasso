@@ -250,6 +250,18 @@ public class Picasso {
   }
 
   /**
+   * Resume paused requests with the given with a delay. Use {@link #pauseTag(Object)}
+   * to pause requests with the given tag.
+   *
+   * @see #pauseTag(Object)
+   * @see #resumeTag(Object)
+   * @see RequestCreator#tag(Object)
+   */
+  public void resumeTag(Object tag, long millis) {
+    dispatcher.dispatchResumeTag(tag, millis);
+  }
+
+  /**
    * Start an image request using the specified URI.
    * <p>
    * Passing {@code null} as a {@code uri} will not trigger any request but will set a placeholder,
@@ -415,18 +427,18 @@ public class Picasso {
     targetToDeferredRequestCreator.put(view, request);
   }
 
-  void enqueueAndSubmit(Action action) {
+  void enqueueAndSubmit(Action action, long delayMillis) {
     Object target = action.getTarget();
     if (target != null && targetToAction.get(target) != action) {
       // This will also check we are on the main thread.
       cancelExistingRequest(target);
       targetToAction.put(target, action);
     }
-    submit(action);
+    submit(action, delayMillis);
   }
 
-  void submit(Action action) {
-    dispatcher.dispatchSubmit(action);
+  void submit(Action action, long delayMillis) {
+    dispatcher.dispatchSubmit(action, delayMillis);
   }
 
   Bitmap quickMemoryCacheCheck(String key) {
@@ -486,7 +498,7 @@ public class Picasso {
       }
     } else {
       // Re-submit the action to the executor.
-      enqueueAndSubmit(action);
+      enqueueAndSubmit(action, 0);
       if (loggingEnabled) {
         log(OWNER_MAIN, VERB_RESUMED, action.request.logId());
       }

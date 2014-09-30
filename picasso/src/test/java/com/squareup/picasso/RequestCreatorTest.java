@@ -120,7 +120,7 @@ public class RequestCreatorTest {
 
   @Test public void fetchSubmitsFetchRequest() throws Exception {
     new RequestCreator(picasso, URI_1, 0).fetch();
-    verify(picasso).submit(actionCaptor.capture());
+    verify(picasso).submit(actionCaptor.capture(), eq(0L));
     assertThat(actionCaptor.getValue()).isInstanceOf(FetchAction.class);
   }
 
@@ -134,13 +134,13 @@ public class RequestCreatorTest {
 
   @Test public void fetchWithDefaultPriority() throws Exception {
     new RequestCreator(picasso, URI_1, 0).fetch();
-    verify(picasso).submit(actionCaptor.capture());
+    verify(picasso).submit(actionCaptor.capture(), eq(0L));
     assertThat(actionCaptor.getValue().getPriority()).isEqualTo(LOW);
   }
 
   @Test public void fetchWithCustomPriority() throws Exception {
     new RequestCreator(picasso, URI_1, 0).priority(HIGH).fetch();
-    verify(picasso).submit(actionCaptor.capture());
+    verify(picasso).submit(actionCaptor.capture(), eq(0L));
     assertThat(actionCaptor.getValue().getPriority()).isEqualTo(HIGH);
   }
 
@@ -180,7 +180,7 @@ public class RequestCreatorTest {
     new RequestCreator(picasso, URI_1, 0).into(target);
     verify(target).onBitmapLoaded(BITMAP_1, MEMORY);
     verify(picasso).cancelRequest(target);
-    verify(picasso, never()).enqueueAndSubmit(any(Action.class));
+    verify(picasso, never()).enqueueAndSubmit(any(Action.class), eq(0L));
   }
 
   @Test
@@ -196,31 +196,31 @@ public class RequestCreatorTest {
     Drawable placeHolderDrawable = mock(Drawable.class);
     new RequestCreator(picasso, URI_1, 0).placeholder(placeHolderDrawable).into(target);
     verify(target).onPrepareLoad(placeHolderDrawable);
-    verify(picasso).enqueueAndSubmit(actionCaptor.capture());
+    verify(picasso).enqueueAndSubmit(actionCaptor.capture(), eq(0L));
     assertThat(actionCaptor.getValue()).isInstanceOf(TargetAction.class);
   }
 
   @Test public void targetActionWithDefaultPriority() throws Exception {
     new RequestCreator(picasso, URI_1, 0).into(mockTarget());
-    verify(picasso).enqueueAndSubmit(actionCaptor.capture());
+    verify(picasso).enqueueAndSubmit(actionCaptor.capture(), eq(0L));
     assertThat(actionCaptor.getValue().getPriority()).isEqualTo(NORMAL);
   }
 
   @Test public void targetActionWithCustomPriority() throws Exception {
     new RequestCreator(picasso, URI_1, 0).priority(HIGH).into(mockTarget());
-    verify(picasso).enqueueAndSubmit(actionCaptor.capture());
+    verify(picasso).enqueueAndSubmit(actionCaptor.capture(), eq(0L));
     assertThat(actionCaptor.getValue().getPriority()).isEqualTo(HIGH);
   }
 
   @Test public void targetActionWithDefaultTag() throws Exception {
     new RequestCreator(picasso, URI_1, 0).into(mockTarget());
-    verify(picasso).enqueueAndSubmit(actionCaptor.capture());
+    verify(picasso).enqueueAndSubmit(actionCaptor.capture(), eq(0L));
     assertThat(actionCaptor.getValue().getTag()).isEqualTo(actionCaptor.getValue());
   }
 
   @Test public void targetActionWithCustomTag() throws Exception {
     new RequestCreator(picasso, URI_1, 0).tag("tag").into(mockTarget());
-    verify(picasso).enqueueAndSubmit(actionCaptor.capture());
+    verify(picasso).enqueueAndSubmit(actionCaptor.capture(), eq(0L));
     assertThat(actionCaptor.getValue().getTag()).isEqualTo("tag");
   }
 
@@ -239,7 +239,7 @@ public class RequestCreatorTest {
     new RequestCreator(picasso, null, 0).into(target);
     verify(picasso).cancelRequest(target);
     verify(picasso, never()).quickMemoryCacheCheck(anyString());
-    verify(picasso, never()).enqueueAndSubmit(any(Action.class));
+    verify(picasso, never()).enqueueAndSubmit(any(Action.class), eq(0L));
   }
 
   @Test
@@ -254,7 +254,7 @@ public class RequestCreatorTest {
     verify(target).setImageDrawable(any(PicassoDrawable.class));
     verify(callback).onSuccess();
     verify(picasso).cancelRequest(target);
-    verify(picasso, never()).enqueueAndSubmit(any(Action.class));
+    verify(picasso, never()).enqueueAndSubmit(any(Action.class), eq(0L));
   }
 
   @Test
@@ -266,7 +266,7 @@ public class RequestCreatorTest {
     Drawable placeHolderDrawable = mock(Drawable.class);
     new RequestCreator(picasso, URI_1, 0).placeholder(placeHolderDrawable).into(target);
     verify(target).setImageDrawable(placeHolderDrawable);
-    verify(picasso).enqueueAndSubmit(actionCaptor.capture());
+    verify(picasso).enqueueAndSubmit(actionCaptor.capture(), eq(0L));
     assertThat(actionCaptor.getValue()).isInstanceOf(ImageViewAction.class);
   }
 
@@ -278,7 +278,7 @@ public class RequestCreatorTest {
     ImageView target = mockImageViewTarget();
     new RequestCreator(picasso, URI_1, 0).placeholder(R.drawable.picture_frame).into(target);
     verify(target).setImageResource(R.drawable.picture_frame);
-    verify(picasso).enqueueAndSubmit(actionCaptor.capture());
+    verify(picasso).enqueueAndSubmit(actionCaptor.capture(), eq(0L));
     assertThat(actionCaptor.getValue()).isInstanceOf(ImageViewAction.class);
   }
 
@@ -302,7 +302,7 @@ public class RequestCreatorTest {
 
   @Test
   public void intoNotOnMainThreadCrashes() throws Exception {
-    doCallRealMethod().when(picasso).enqueueAndSubmit(any(Action.class));
+    doCallRealMethod().when(picasso).enqueueAndSubmit(any(Action.class), eq(0L));
     final CountDownLatch latch = new CountDownLatch(1);
     new Thread(new Runnable() {
       @Override public void run() {
@@ -322,7 +322,7 @@ public class RequestCreatorTest {
   public void intoImageViewAndNotInCacheSubmitsImageViewRequest() throws Exception {
     ImageView target = mockImageViewTarget();
     new RequestCreator(picasso, URI_1, 0).into(target);
-    verify(picasso).enqueueAndSubmit(actionCaptor.capture());
+    verify(picasso).enqueueAndSubmit(actionCaptor.capture(), eq(0L));
     assertThat(actionCaptor.getValue()).isInstanceOf(ImageViewAction.class);
   }
 
@@ -332,7 +332,7 @@ public class RequestCreatorTest {
     when(target.getWidth()).thenReturn(0);
     when(target.getHeight()).thenReturn(0);
     new RequestCreator(picasso, URI_1, 0).fit().into(target);
-    verify(picasso, never()).enqueueAndSubmit(any(Action.class));
+    verify(picasso, never()).enqueueAndSubmit(any(Action.class), eq(0L));
     verify(picasso).defer(eq(target), any(DeferredRequestCreator.class));
   }
 
@@ -342,7 +342,7 @@ public class RequestCreatorTest {
     when(target.getWidth()).thenReturn(100);
     when(target.getHeight()).thenReturn(100);
     new RequestCreator(picasso, URI_1, 0).fit().into(target);
-    verify(picasso).enqueueAndSubmit(actionCaptor.capture());
+    verify(picasso).enqueueAndSubmit(actionCaptor.capture(), eq(0L));
     assertThat(actionCaptor.getValue()).isInstanceOf(ImageViewAction.class);
   }
 
@@ -365,37 +365,37 @@ public class RequestCreatorTest {
 
   @Test public void imageViewActionWithDefaultPriority() throws Exception {
     new RequestCreator(picasso, URI_1, 0).into(mockImageViewTarget());
-    verify(picasso).enqueueAndSubmit(actionCaptor.capture());
+    verify(picasso).enqueueAndSubmit(actionCaptor.capture(), eq(0L));
     assertThat(actionCaptor.getValue().getPriority()).isEqualTo(NORMAL);
   }
 
   @Test public void imageViewActionWithCustomPriority() throws Exception {
     new RequestCreator(picasso, URI_1, 0).priority(HIGH).into(mockImageViewTarget());
-    verify(picasso).enqueueAndSubmit(actionCaptor.capture());
+    verify(picasso).enqueueAndSubmit(actionCaptor.capture(), eq(0L));
     assertThat(actionCaptor.getValue().getPriority()).isEqualTo(HIGH);
   }
 
   @Test public void imageViewActionWithDefaultTag() throws Exception {
     new RequestCreator(picasso, URI_1, 0).into(mockImageViewTarget());
-    verify(picasso).enqueueAndSubmit(actionCaptor.capture());
+    verify(picasso).enqueueAndSubmit(actionCaptor.capture(), eq(0L));
     assertThat(actionCaptor.getValue().getTag()).isEqualTo(actionCaptor.getValue());
   }
 
   @Test public void imageViewActionWithCustomTag() throws Exception {
     new RequestCreator(picasso, URI_1, 0).tag("tag").into(mockImageViewTarget());
-    verify(picasso).enqueueAndSubmit(actionCaptor.capture());
+    verify(picasso).enqueueAndSubmit(actionCaptor.capture(), eq(0L));
     assertThat(actionCaptor.getValue().getTag()).isEqualTo("tag");
   }
 
   @Test public void intoRemoteViewsWidgetQueuesAppWidgetAction() throws Exception {
     new RequestCreator(picasso, URI_1, 0).into(mockRemoteViews(), 0, new int[] { 1, 2, 3 });
-    verify(picasso).enqueueAndSubmit(actionCaptor.capture());
+    verify(picasso).enqueueAndSubmit(actionCaptor.capture(), eq(0L));
     assertThat(actionCaptor.getValue()).isInstanceOf(AppWidgetAction.class);
   }
 
   @Test public void intoRemoteViewsNotificationQueuesNotificationAction() throws Exception {
     new RequestCreator(picasso, URI_1, 0).into(mockRemoteViews(), 0, 0, mockNotification());
-    verify(picasso).enqueueAndSubmit(actionCaptor.capture());
+    verify(picasso).enqueueAndSubmit(actionCaptor.capture(), eq(0L));
     assertThat(actionCaptor.getValue()).isInstanceOf(NotificationAction.class);
   }
 
@@ -497,53 +497,53 @@ public class RequestCreatorTest {
 
   @Test public void appWidgetActionWithDefaultPriority() throws Exception {
     new RequestCreator(picasso, URI_1, 0).into(mockRemoteViews(), 0, new int[] { 1, 2, 3 });
-    verify(picasso).enqueueAndSubmit(actionCaptor.capture());
+    verify(picasso).enqueueAndSubmit(actionCaptor.capture(), eq(0L));
     assertThat(actionCaptor.getValue().getPriority()).isEqualTo(NORMAL);
   }
 
   @Test public void appWidgetActionWithCustomPriority() throws Exception {
     new RequestCreator(picasso, URI_1, 0).priority(HIGH)
         .into(mockRemoteViews(), 0, new int[]{1, 2, 3});
-    verify(picasso).enqueueAndSubmit(actionCaptor.capture());
+    verify(picasso).enqueueAndSubmit(actionCaptor.capture(), eq(0L));
     assertThat(actionCaptor.getValue().getPriority()).isEqualTo(HIGH);
   }
 
   @Test public void notificationActionWithDefaultPriority() throws Exception {
     new RequestCreator(picasso, URI_1, 0).into(mockRemoteViews(), 0, 0, mockNotification());
-    verify(picasso).enqueueAndSubmit(actionCaptor.capture());
+    verify(picasso).enqueueAndSubmit(actionCaptor.capture(), eq(0L));
     assertThat(actionCaptor.getValue().getPriority()).isEqualTo(NORMAL);
   }
 
   @Test public void notificationActionWithCustomPriority() throws Exception {
     new RequestCreator(picasso, URI_1, 0).priority(HIGH)
         .into(mockRemoteViews(), 0, 0, mockNotification());
-    verify(picasso).enqueueAndSubmit(actionCaptor.capture());
+    verify(picasso).enqueueAndSubmit(actionCaptor.capture(), eq(0L));
     assertThat(actionCaptor.getValue().getPriority()).isEqualTo(HIGH);
   }
 
   @Test public void appWidgetActionWithDefaultTag() throws Exception {
     new RequestCreator(picasso, URI_1, 0).into(mockRemoteViews(), 0, new int[] { 1, 2, 3 });
-    verify(picasso).enqueueAndSubmit(actionCaptor.capture());
+    verify(picasso).enqueueAndSubmit(actionCaptor.capture(), eq(0L));
     assertThat(actionCaptor.getValue().getTag()).isEqualTo(actionCaptor.getValue());
   }
 
   @Test public void appWidgetActionWithCustomTag() throws Exception {
     new RequestCreator(picasso, URI_1, 0).tag("tag")
         .into(mockRemoteViews(), 0, new int[]{1, 2, 3});
-    verify(picasso).enqueueAndSubmit(actionCaptor.capture());
+    verify(picasso).enqueueAndSubmit(actionCaptor.capture(), eq(0L));
     assertThat(actionCaptor.getValue().getTag()).isEqualTo("tag");
   }
 
   @Test public void notificationActionWithDefaultTag() throws Exception {
     new RequestCreator(picasso, URI_1, 0).into(mockRemoteViews(), 0, 0, mockNotification());
-    verify(picasso).enqueueAndSubmit(actionCaptor.capture());
+    verify(picasso).enqueueAndSubmit(actionCaptor.capture(), eq(0L));
     assertThat(actionCaptor.getValue().getTag()).isEqualTo(actionCaptor.getValue());
   }
 
   @Test public void notificationActionWithCustomTag() throws Exception {
     new RequestCreator(picasso, URI_1, 0).tag("tag")
         .into(mockRemoteViews(), 0, 0, mockNotification());
-    verify(picasso).enqueueAndSubmit(actionCaptor.capture());
+    verify(picasso).enqueueAndSubmit(actionCaptor.capture(), eq(0L));
     assertThat(actionCaptor.getValue().getTag()).isEqualTo("tag");
   }
 
