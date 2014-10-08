@@ -54,6 +54,12 @@ public final class Request {
   /** Target image height for resizing. */
   public final int targetHeight;
   /**
+   * If true the bitmap will be resized only if bigger than
+   * {@link #targetWidth} or {@link #targetHeight}
+   */
+  public final boolean resizeOnlyIfBigger;
+
+  /**
    * True if the final image should use the 'centerCrop' scale technique.
    * <p>
    * This is mutually exclusive with {@link #centerInside}.
@@ -80,6 +86,7 @@ public final class Request {
 
   private Request(Uri uri, int resourceId, List<Transformation> transformations, int targetWidth,
       int targetHeight, boolean centerCrop, boolean centerInside, float rotationDegrees,
+      boolean resizeOnlyIfBigger,
       float rotationPivotX, float rotationPivotY, boolean hasRotationPivot, Bitmap.Config config,
       Priority priority) {
     this.uri = uri;
@@ -97,6 +104,7 @@ public final class Request {
     this.rotationPivotX = rotationPivotX;
     this.rotationPivotY = rotationPivotY;
     this.hasRotationPivot = hasRotationPivot;
+    this.resizeOnlyIfBigger = resizeOnlyIfBigger;
     this.config = config;
     this.priority = priority;
   }
@@ -191,6 +199,7 @@ public final class Request {
     private List<Transformation> transformations;
     private Bitmap.Config config;
     private Priority priority;
+    private boolean resizeOnlyIfBigger;
 
     /** Start building a request using the specified {@link Uri}. */
     public Builder(Uri uri) {
@@ -218,6 +227,7 @@ public final class Request {
       rotationPivotX = request.rotationPivotX;
       rotationPivotY = request.rotationPivotY;
       hasRotationPivot = request.hasRotationPivot;
+      resizeOnlyIfBigger = request.resizeOnlyIfBigger;
       if (request.transformations != null) {
         transformations = new ArrayList<Transformation>(request.transformations);
       }
@@ -267,6 +277,11 @@ public final class Request {
 
     /** Resize the image to the specified size in pixels. */
     public Builder resize(int targetWidth, int targetHeight) {
+      return resize(targetWidth, targetHeight, false);
+    }
+
+    /** Resize the image to the specified size in pixels. */
+    public Builder resize(int targetWidth, int targetHeight, boolean onlyIfBigger) {
       if (targetWidth <= 0) {
         throw new IllegalArgumentException("Width must be positive number.");
       }
@@ -275,6 +290,7 @@ public final class Request {
       }
       this.targetWidth = targetWidth;
       this.targetHeight = targetHeight;
+      this.resizeOnlyIfBigger = onlyIfBigger;
       return this;
     }
 
@@ -284,6 +300,7 @@ public final class Request {
       targetHeight = 0;
       centerCrop = false;
       centerInside = false;
+      resizeOnlyIfBigger = false;
       return this;
     }
 
@@ -397,8 +414,10 @@ public final class Request {
         priority = Priority.NORMAL;
       }
       return new Request(uri, resourceId, transformations, targetWidth, targetHeight, centerCrop,
-          centerInside, rotationDegrees, rotationPivotX, rotationPivotY, hasRotationPivot, config,
-          priority);
+              centerInside, rotationDegrees,
+              resizeOnlyIfBigger,
+              rotationPivotX, rotationPivotY, hasRotationPivot, config,
+              priority);
     }
   }
 }

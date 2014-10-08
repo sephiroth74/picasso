@@ -35,7 +35,7 @@ import java.util.WeakHashMap;
 import java.util.concurrent.ExecutorService;
 
 import static android.os.Process.THREAD_PRIORITY_BACKGROUND;
-import static com.squareup.picasso.Action.RequestWeakReference;
+
 import static com.squareup.picasso.Dispatcher.HUNTER_BATCH_COMPLETE;
 import static com.squareup.picasso.Dispatcher.REQUEST_BATCH_RESUME;
 import static com.squareup.picasso.Dispatcher.REQUEST_GCED;

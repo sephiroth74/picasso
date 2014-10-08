@@ -420,6 +420,7 @@ class BitmapHunter implements Runnable {
     if (data.needsMatrixTransform()) {
       int targetWidth = data.targetWidth;
       int targetHeight = data.targetHeight;
+      boolean resizeOnlyIfBigger = data.resizeOnlyIfBigger;
 
       float targetRotation = data.rotationDegrees;
       if (targetRotation != 0) {
@@ -445,19 +446,28 @@ class BitmapHunter implements Runnable {
           drawX = (inWidth - newSize) / 2;
           drawWidth = newSize;
         }
-        matrix.preScale(scale, scale);
+        if (!resizeOnlyIfBigger || (resizeOnlyIfBigger
+                && (inWidth > targetWidth || inHeight > targetHeight))) {
+          matrix.preScale(scale, scale);
+        }
       } else if (data.centerInside) {
         float widthRatio = targetWidth / (float) inWidth;
         float heightRatio = targetHeight / (float) inHeight;
         float scale = widthRatio < heightRatio ? widthRatio : heightRatio;
-        matrix.preScale(scale, scale);
+        if (!resizeOnlyIfBigger || (resizeOnlyIfBigger
+                && (inWidth > targetWidth || inHeight > targetHeight))) {
+          matrix.preScale(scale, scale);
+        }
       } else if (targetWidth != 0 && targetHeight != 0 //
           && (targetWidth != inWidth || targetHeight != inHeight)) {
         // If an explicit target size has been specified and they do not match the results bounds,
         // pre-scale the existing matrix appropriately.
         float sx = targetWidth / (float) inWidth;
         float sy = targetHeight / (float) inHeight;
-        matrix.preScale(sx, sy);
+        if (!resizeOnlyIfBigger || (resizeOnlyIfBigger
+                && (inWidth > targetWidth || inHeight > targetHeight))) {
+          matrix.preScale(sx, sy);
+        }
       }
     }
 
