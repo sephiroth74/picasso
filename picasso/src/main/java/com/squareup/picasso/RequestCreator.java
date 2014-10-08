@@ -23,6 +23,8 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.widget.ImageView;
 import android.widget.RemoteViews;
+
+import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -92,6 +94,13 @@ public class RequestCreator {
     if (picasso.shutdown) {
       throw new IllegalStateException(
           "Picasso instance already shut down. Cannot submit new requests.");
+    }
+
+    if (null != uri) {
+      final String scheme = uri.getScheme();
+      if (null == scheme) {
+        uri = Uri.fromFile(new File(uri.getPath()));
+      }
     }
     this.picasso = picasso;
     this.data = new Request.Builder(uri, resourceId);
