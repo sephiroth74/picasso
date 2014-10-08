@@ -252,6 +252,20 @@ public class RequestCreator {
   }
 
   /**
+   * Resized the image based on the bounds specified by {@link #resize(int, int)}
+   * and taking only the largest image side into account.
+   * This means that if 'resize(300, 200)' is called and the image size is 800x600,
+   * then the image will be resized to 300x225 because the largest side is 800, which
+   * will be resized to 300 and the height, which is 600, will be resized according to
+   * its original size ratio.
+   * @return
+   */
+  public RequestCreator resizeByMaxSide() {
+    data.resizeByMaxSide();
+    return this;
+  }
+
+  /**
    * Crops an image inside of the bounds specified by {@link #resize(int, int)} rather than
    * distorting the aspect ratio. This cropping technique scales the image so that it fills the
    * requested bounds and then crops the extra.

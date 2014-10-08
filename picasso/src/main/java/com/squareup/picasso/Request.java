@@ -71,6 +71,7 @@ public final class Request {
    * This is mutually exclusive with {@link #centerCrop}.
    */
   public final boolean centerInside;
+  public final boolean resizeByMaxSide;
   /** Amount to rotate the image in degrees. */
   public final float rotationDegrees;
   /** Rotation pivot on the X axis. */
@@ -86,7 +87,7 @@ public final class Request {
 
   private Request(Uri uri, int resourceId, List<Transformation> transformations, int targetWidth,
       int targetHeight, boolean centerCrop, boolean centerInside, float rotationDegrees,
-      boolean resizeOnlyIfBigger,
+      boolean resizeOnlyIfBigger, boolean resizeByMaxSide,
       float rotationPivotX, float rotationPivotY, boolean hasRotationPivot, Bitmap.Config config,
       Priority priority) {
     this.uri = uri;
@@ -105,6 +106,7 @@ public final class Request {
     this.rotationPivotY = rotationPivotY;
     this.hasRotationPivot = hasRotationPivot;
     this.resizeOnlyIfBigger = resizeOnlyIfBigger;
+    this.resizeByMaxSide = resizeByMaxSide;
     this.config = config;
     this.priority = priority;
   }
@@ -192,6 +194,7 @@ public final class Request {
     private int targetHeight;
     private boolean centerCrop;
     private boolean centerInside;
+    private boolean resizeByMaxSide;
     private float rotationDegrees;
     private float rotationPivotX;
     private float rotationPivotY;
@@ -294,6 +297,16 @@ public final class Request {
       return this;
     }
 
+    /** Resizes the image by its max side */
+    public Builder resizeByMaxSide() {
+      if (centerInside || centerCrop) {
+        throw new IllegalStateException("Resize by max side cannot be used with centerCrop or " +
+            "centerInside");
+      }
+      this.resizeByMaxSide = true;
+      return this;
+    }
+
     /** Clear the resize transformation, if any. This will also clear center crop/inside if set. */
     public Builder clearResize() {
       targetWidth = 0;
@@ -301,6 +314,7 @@ public final class Request {
       centerCrop = false;
       centerInside = false;
       resizeOnlyIfBigger = false;
+      resizeByMaxSide = false;
       return this;
     }
 
@@ -310,8 +324,9 @@ public final class Request {
      * requested bounds and then crops the extra.
      */
     public Builder centerCrop() {
-      if (centerInside) {
-        throw new IllegalStateException("Center crop can not be used after calling centerInside");
+      if (centerInside || resizeByMaxSide) {
+        throw new IllegalStateException("Center crop can not be used after calling centerInside " +
+            "or resizeByMaxSide");
       }
       centerCrop = true;
       return this;
@@ -328,8 +343,9 @@ public final class Request {
      * the image so that both dimensions are equal to or less than the requested bounds.
      */
     public Builder centerInside() {
-      if (centerCrop) {
-        throw new IllegalStateException("Center inside can not be used after calling centerCrop");
+      if (centerCrop || resizeByMaxSide) {
+        throw new IllegalStateException("Center inside can not be used after calling centerCrop" +
+            " or resizeByMaxSide");
       }
       centerInside = true;
       return this;
@@ -404,18 +420,29 @@ public final class Request {
       if (centerInside && centerCrop) {
         throw new IllegalStateException("Center crop and center inside can not be used together.");
       }
+      if (centerInside && resizeByMaxSide) {
+        throw new IllegalStateException("Center Inside and resize by max side can not be used together.");
+      }
+      if (centerCrop && resizeByMaxSide) {
+        throw new IllegalStateException("Center crop and resize by max side can not be used together.");
+      }
       if (centerCrop && targetWidth == 0) {
         throw new IllegalStateException("Center crop requires calling resize.");
       }
       if (centerInside && targetWidth == 0) {
         throw new IllegalStateException("Center inside requires calling resize.");
       }
+      if (resizeByMaxSide) {
+        if (targetWidth == 0 || targetHeight == 0) {
+          throw new IllegalStateException("Resize by max side requires target width and height &gt; 0");
+        }
+      }
       if (priority == null) {
         priority = Priority.NORMAL;
       }
       return new Request(uri, resourceId, transformations, targetWidth, targetHeight, centerCrop,
               centerInside, rotationDegrees,
-              resizeOnlyIfBigger,
+              resizeOnlyIfBigger, resizeByMaxSide,
               rotationPivotX, rotationPivotY, hasRotationPivot, config,
               priority);
     }

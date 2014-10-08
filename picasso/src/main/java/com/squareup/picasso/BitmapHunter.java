@@ -458,6 +458,19 @@ class BitmapHunter implements Runnable {
                 && (inWidth > targetWidth || inHeight > targetHeight))) {
           matrix.preScale(scale, scale);
         }
+      } else if (data.resizeByMaxSide && (targetWidth != inWidth || targetHeight != inHeight)) {
+        float sx;
+
+        if(inWidth > inHeight){
+          sx = targetWidth / (float) inWidth;
+        } else {
+          sx = targetHeight / (float) inHeight;
+        }
+
+        if (!resizeOnlyIfBigger || (resizeOnlyIfBigger && (sx < 1.0))) {
+          matrix.preScale(sx, sx);
+        }
+
       } else if (targetWidth != 0 && targetHeight != 0 //
           && (targetWidth != inWidth || targetHeight != inHeight)) {
         // If an explicit target size has been specified and they do not match the results bounds,

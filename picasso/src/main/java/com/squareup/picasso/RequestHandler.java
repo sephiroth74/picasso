@@ -18,6 +18,7 @@ package com.squareup.picasso;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.NetworkInfo;
+import android.util.Log;
 
 import java.io.IOException;
 
@@ -144,6 +145,13 @@ public abstract class RequestHandler {
   static void calculateInSampleSize(int reqWidth, int reqHeight, int width, int height,
       BitmapFactory.Options options, Request request) {
     int sampleSize = 1;
+    if (request.resizeByMaxSide) {
+      if (width >= height) {
+        reqHeight = reqWidth;
+      } else {
+        reqWidth = reqHeight;
+      }
+    }
     if (height > reqHeight || width > reqWidth) {
       final int heightRatio = (int) Math.floor((float) height / (float) reqHeight);
       final int widthRatio = (int) Math.floor((float) width / (float) reqWidth);
