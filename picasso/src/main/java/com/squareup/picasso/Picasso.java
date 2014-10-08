@@ -38,6 +38,7 @@ import static android.os.Process.THREAD_PRIORITY_BACKGROUND;
 
 import static com.squareup.picasso.Dispatcher.HUNTER_BATCH_COMPLETE;
 import static com.squareup.picasso.Dispatcher.REQUEST_BATCH_RESUME;
+import static com.squareup.picasso.Dispatcher.REQUEST_COMPLETE;
 import static com.squareup.picasso.Dispatcher.REQUEST_GCED;
 import static com.squareup.picasso.Picasso.LoadedFrom.MEMORY;
 import static com.squareup.picasso.Utils.OWNER_MAIN;
@@ -126,6 +127,10 @@ public class Picasso {
             Action action = batch.get(i);
             action.picasso.resumeAction(action);
           }
+          break;
+        case REQUEST_COMPLETE:
+          BitmapHunter hunter = (BitmapHunter) msg.obj;
+          hunter.picasso.complete(hunter);
           break;
         default:
           throw new AssertionError("Unknown handler message received: " + msg.what);
@@ -543,6 +548,15 @@ public class Picasso {
         deferredRequestCreator.cancel();
       }
     }
+  }
+
+  /**
+   * Toggle the batch mode for delivering results.
+   * Setting to true can cause lag in the UI.
+   * @param useBatch toggle on/off batch delivering
+   */
+  public void setUseBatch(boolean useBatch) {
+    this.dispatcher.setUseBatch(useBatch);
   }
 
   private static class CleanupThread extends Thread {
