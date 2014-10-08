@@ -390,16 +390,16 @@ class BitmapHunter implements Runnable {
       }
 
       // If the transformation returned a new bitmap ensure they recycled the original.
-      if (newResult != result && !result.isRecycled()) {
-        Picasso.HANDLER.post(new Runnable() {
-          @Override public void run() {
-            throw new IllegalStateException("Transformation "
-                + transformation.key()
-                + " mutated input Bitmap but failed to recycle the original.");
-          }
-        });
-        return null;
-      }
+//      if (newResult != result && !result.isRecycled()) {
+//        Picasso.HANDLER.post(new Runnable() {
+//          @Override public void run() {
+//            throw new IllegalStateException("Transformation "
+//                + transformation.key()
+//                + " mutated input Bitmap but failed to recycle the original.");
+//          }
+//        });
+//        return null;
+//      }
 
       result = newResult;
     }
