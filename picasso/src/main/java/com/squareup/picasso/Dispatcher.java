@@ -209,7 +209,8 @@ class Dispatcher {
       return;
     }
 
-    hunter = forRequest(action.getPicasso(), this, action.request.cache, stats, action);
+    hunter = forRequest(action.getPicasso(), this, action.request.cache,
+      action.request.diskCache, stats, action);
     hunter.future = service.submit(hunter);
     hunterMap.put(action.getKey(), hunter);
     failedActions.remove(action.getTarget());
@@ -374,6 +375,11 @@ class Dispatcher {
     if (!hunter.shouldSkipMemoryCache()) {
       hunter.cache.set(hunter.getKey(), hunter.getResult());
     }
+
+    if (null != hunter.getResult() && null != hunter.diskCache) {
+      hunter.diskCache.set(hunter.getKey(), hunter.getResult());
+    }
+
     hunterMap.remove(hunter.getKey());
     batch(hunter);
     if (hunter.getPicasso().loggingEnabled) {

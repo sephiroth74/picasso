@@ -86,13 +86,15 @@ public final class Request {
   public final Priority priority;
   /** cache to be used */
   public final Cache cache;
+  /** optional disk cache */
+  public final Cache diskCache;
 
   private Request(Uri uri, int resourceId, List<Transformation> transformations, int targetWidth,
       int targetHeight, boolean centerCrop, boolean centerInside, float rotationDegrees,
       boolean resizeOnlyIfBigger, boolean resizeByMaxSide,
       float rotationPivotX, float rotationPivotY, boolean hasRotationPivot, Bitmap.Config config,
       Priority priority,
-      Cache cache) {
+      Cache cache, Cache diskCache) {
     this.uri = uri;
     this.resourceId = resourceId;
     if (transformations == null) {
@@ -113,6 +115,7 @@ public final class Request {
     this.config = config;
     this.priority = priority;
     this.cache = cache;
+    this.diskCache = diskCache;
   }
 
   @Override public String toString() {
@@ -208,6 +211,7 @@ public final class Request {
     private Priority priority;
     private boolean resizeOnlyIfBigger;
     private Cache cache;
+    private Cache diskCache;
 
     /** Start building a request using the specified {@link Uri}. */
     public Builder(Uri uri) {
@@ -242,6 +246,7 @@ public final class Request {
       config = request.config;
       priority = request.priority;
       cache = request.cache;
+      diskCache = request.diskCache;
     }
 
     boolean hasImage() {
@@ -402,6 +407,15 @@ public final class Request {
       return this.cache;
     }
 
+    public Builder setDiskCache(Cache cache) {
+      this.diskCache = cache;
+      return this;
+    }
+
+    public Cache getDiskCache() {
+      return this.diskCache;
+    }
+
     /** Execute request using the specified priority. */
     public Builder priority(Priority priority) {
       if (priority == null) {
@@ -460,7 +474,7 @@ public final class Request {
               resizeOnlyIfBigger, resizeByMaxSide,
               rotationPivotX, rotationPivotY, hasRotationPivot, config,
               priority,
-              cache);
+              cache, diskCache);
     }
   }
 }

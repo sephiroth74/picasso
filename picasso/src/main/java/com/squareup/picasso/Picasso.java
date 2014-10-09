@@ -799,7 +799,8 @@ public class Picasso {
   public enum LoadedFrom {
     MEMORY(Color.GREEN),
     DISK(Color.YELLOW),
-    NETWORK(Color.RED);
+    NETWORK(Color.RED),
+    DISK_CACHE(Color.BLUE);
 
     final int debugColor;
 

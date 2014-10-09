@@ -16,9 +16,9 @@ public class SampleScrollListener implements AbsListView.OnScrollListener {
   public void onScrollStateChanged(AbsListView view, int scrollState) {
     final Picasso picasso = Picasso.with(context);
     if (scrollState == SCROLL_STATE_IDLE || scrollState == SCROLL_STATE_TOUCH_SCROLL) {
-      picasso.resumeTag(context);
+//      picasso.resumeTag(context);
     } else {
-      picasso.pauseTag(context);
+//      picasso.pauseTag(context);
     }
   }
 

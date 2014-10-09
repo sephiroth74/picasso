@@ -321,6 +321,17 @@ public class RequestCreator {
   }
 
   /**
+   * Specify a diskCache to use
+   *
+   * @param cache
+   * @return
+   */
+  public RequestCreator withDiskCache(Cache cache) {
+    data.setDiskCache(cache);
+    return this;
+  }
+
+  /**
    * Set the priority of this request.
    * <p>
    * This will affect the order in which the requests execute but does not guarantee it.
@@ -401,7 +412,7 @@ public class RequestCreator {
     String key = createKey(finalData, new StringBuilder());
 
     Action action = new GetAction(picasso, finalData, skipMemoryCache, key, tag, fadeTime);
-    return forRequest(picasso, picasso.dispatcher, data.getCache(), picasso.stats, action).hunt();
+    return forRequest(picasso, picasso.dispatcher, data.getCache(), data.getDiskCache(), picasso.stats, action).hunt();
   }
 
   /**

@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static com.squareup.picasso.Picasso.LoadedFrom.DISK_CACHE;
 import static com.squareup.picasso.Picasso.LoadedFrom.MEMORY;
 import static com.squareup.picasso.Picasso.Priority;
 import static com.squareup.picasso.Picasso.Priority.LOW;
@@ -69,6 +70,7 @@ class BitmapHunter implements Runnable {
   final Picasso picasso;
   final Dispatcher dispatcher;
   final Cache cache;
+  final Cache diskCache;
   final Stats stats;
   final String key;
   final Request data;
@@ -85,12 +87,14 @@ class BitmapHunter implements Runnable {
   int retryCount;
   Priority priority;
 
-  BitmapHunter(Picasso picasso, Dispatcher dispatcher, Cache cache, Stats stats, Action action,
+  BitmapHunter(Picasso picasso, Dispatcher dispatcher, Cache cache, Cache diskCache,
+               Stats stats, Action action,
                RequestHandler requestHandler) {
     this.sequence = SEQUENCE_GENERATOR.incrementAndGet();
     this.picasso = picasso;
     this.dispatcher = dispatcher;
     this.cache = cache;
+    this.diskCache = diskCache;
     this.stats = stats;
     this.key = action.getKey();
     this.data = action.getRequest();
@@ -151,6 +155,15 @@ class BitmapHunter implements Runnable {
         if (picasso.loggingEnabled) {
           log(OWNER_HUNTER, VERB_DECODED, data.logId(), "from cache");
         }
+        return bitmap;
+      }
+    }
+
+    if (diskCache != null) {
+      bitmap = diskCache.get(key);
+      if (null != bitmap) {
+        stats.dispatchCacheHit();
+        loadedFrom = DISK_CACHE;
         return bitmap;
       }
     }
@@ -353,7 +366,7 @@ class BitmapHunter implements Runnable {
   }
 
   static BitmapHunter forRequest(Picasso picasso, Dispatcher dispatcher,
-      Cache cache, Stats stats, Action action) {
+      Cache cache, Cache diskCache, Stats stats, Action action) {
     Request request = action.getRequest();
     List<RequestHandler> requestHandlers = picasso.getRequestHandlers();
 
@@ -362,11 +375,13 @@ class BitmapHunter implements Runnable {
     for (int i = 0, count = requestHandlers.size(); i < count; i++) {
       RequestHandler requestHandler = requestHandlers.get(i);
       if (requestHandler.canHandleRequest(request)) {
-        return new BitmapHunter(picasso, dispatcher, cache, stats, action, requestHandler);
+        return new BitmapHunter(picasso, dispatcher, cache, diskCache,
+          stats, action, requestHandler);
       }
     }
 
-    return new BitmapHunter(picasso, dispatcher, cache, stats, action, ERRORING_HANDLER);
+    return new BitmapHunter(picasso, dispatcher, cache, diskCache,
+      stats, action, ERRORING_HANDLER);
   }
 
   static Bitmap applyCustomTransformations(List<Transformation> transformations, Bitmap result) {
