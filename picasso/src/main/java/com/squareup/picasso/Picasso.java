@@ -185,7 +185,9 @@ public class Picasso {
     allRequestHandlers.add(new AssetRequestHandler(context));
     allRequestHandlers.add(new FileRequestHandler(context));
     allRequestHandlers.add(new NetworkRequestHandler(dispatcher.downloader, stats));
-    requestHandlers = Collections.unmodifiableList(allRequestHandlers);
+    // why shouldn't be able to modify the list?
+    // requestHandlers = Collections.unmodifiableList(allRequestHandlers);
+    requestHandlers = Collections.synchronizedList(allRequestHandlers);
 
     this.stats = stats;
     this.targetToAction = new WeakHashMap<Object, Action>();
@@ -423,6 +425,17 @@ public class Picasso {
 
   List<RequestHandler> getRequestHandlers() {
     return requestHandlers;
+  }
+
+  public void addRequestHandler(RequestHandler handler) {
+    if (requestHandlers.contains(handler)) {
+      throw new IllegalStateException("RequestHandler already registered.");
+    }
+    requestHandlers.add(1, handler);
+  }
+
+  public boolean removeRequestHandler(RequestHandler handler) {
+    return requestHandlers.remove(handler);
   }
 
   Request transformRequest(Request request) {
