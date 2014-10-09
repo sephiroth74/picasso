@@ -18,6 +18,7 @@ package com.squareup.picasso;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
 import android.net.NetworkInfo;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;

@@ -84,12 +84,15 @@ public final class Request {
   public final Bitmap.Config config;
   /** The priority of this request. */
   public final Priority priority;
+  /** cache to be used */
+  public final Cache cache;
 
   private Request(Uri uri, int resourceId, List<Transformation> transformations, int targetWidth,
       int targetHeight, boolean centerCrop, boolean centerInside, float rotationDegrees,
       boolean resizeOnlyIfBigger, boolean resizeByMaxSide,
       float rotationPivotX, float rotationPivotY, boolean hasRotationPivot, Bitmap.Config config,
-      Priority priority) {
+      Priority priority,
+      Cache cache) {
     this.uri = uri;
     this.resourceId = resourceId;
     if (transformations == null) {
@@ -109,6 +112,7 @@ public final class Request {
     this.resizeByMaxSide = resizeByMaxSide;
     this.config = config;
     this.priority = priority;
+    this.cache = cache;
   }
 
   @Override public String toString() {
@@ -203,6 +207,7 @@ public final class Request {
     private Bitmap.Config config;
     private Priority priority;
     private boolean resizeOnlyIfBigger;
+    private Cache cache;
 
     /** Start building a request using the specified {@link Uri}. */
     public Builder(Uri uri) {
@@ -236,6 +241,7 @@ public final class Request {
       }
       config = request.config;
       priority = request.priority;
+      cache = request.cache;
     }
 
     boolean hasImage() {
@@ -387,6 +393,15 @@ public final class Request {
       return this;
     }
 
+    public Builder setCache(Cache cache) {
+      this.cache = cache;
+      return this;
+    }
+
+    public Cache getCache() {
+      return this.cache;
+    }
+
     /** Execute request using the specified priority. */
     public Builder priority(Priority priority) {
       if (priority == null) {
@@ -444,7 +459,8 @@ public final class Request {
               centerInside, rotationDegrees,
               resizeOnlyIfBigger, resizeByMaxSide,
               rotationPivotX, rotationPivotY, hasRotationPivot, config,
-              priority);
+              priority,
+              cache);
     }
   }
 }

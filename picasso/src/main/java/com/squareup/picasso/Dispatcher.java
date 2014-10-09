@@ -209,7 +209,7 @@ class Dispatcher {
       return;
     }
 
-    hunter = forRequest(action.getPicasso(), this, cache, stats, action);
+    hunter = forRequest(action.getPicasso(), this, action.request.cache, stats, action);
     hunter.future = service.submit(hunter);
     hunterMap.put(action.getKey(), hunter);
     failedActions.remove(action.getTarget());
@@ -372,7 +372,7 @@ class Dispatcher {
 
   void performComplete(BitmapHunter hunter) {
     if (!hunter.shouldSkipMemoryCache()) {
-      cache.set(hunter.getKey(), hunter.getResult());
+      hunter.cache.set(hunter.getKey(), hunter.getResult());
     }
     hunterMap.remove(hunter.getKey());
     batch(hunter);

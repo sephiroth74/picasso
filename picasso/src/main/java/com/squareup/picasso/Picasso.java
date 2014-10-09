@@ -25,6 +25,7 @@ import android.os.Message;
 import android.os.Process;
 import android.widget.ImageView;
 import android.widget.RemoteViews;
+
 import java.io.File;
 import java.lang.ref.ReferenceQueue;
 import java.util.ArrayList;
@@ -35,7 +36,6 @@ import java.util.WeakHashMap;
 import java.util.concurrent.ExecutorService;
 
 import static android.os.Process.THREAD_PRIORITY_BACKGROUND;
-
 import static com.squareup.picasso.Dispatcher.HUNTER_BATCH_COMPLETE;
 import static com.squareup.picasso.Dispatcher.REQUEST_BATCH_RESUME;
 import static com.squareup.picasso.Dispatcher.REQUEST_COMPLETE;
@@ -454,7 +454,7 @@ public class Picasso {
     dispatcher.dispatchSubmit(action, delayMillis);
   }
 
-  Bitmap quickMemoryCacheCheck(String key) {
+  Bitmap quickMemoryCacheCheck(Cache cache, String key) {
     Bitmap cached = cache.get(key);
     if (cached != null) {
       stats.dispatchCacheHit();
@@ -500,7 +500,7 @@ public class Picasso {
   void resumeAction(Action action) {
     Bitmap bitmap = null;
     if (!action.skipCache) {
-      bitmap = quickMemoryCacheCheck(action.getKey());
+      bitmap = quickMemoryCacheCheck(action.request.cache, action.getKey());
     }
 
     if (bitmap != null) {

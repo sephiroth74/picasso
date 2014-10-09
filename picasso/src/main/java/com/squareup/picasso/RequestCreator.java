@@ -104,11 +104,13 @@ public class RequestCreator {
     }
     this.picasso = picasso;
     this.data = new Request.Builder(uri, resourceId);
+    this.data.setCache(picasso.getCache());
   }
 
   @TestOnly RequestCreator() {
     this.picasso = null;
     this.data = new Request.Builder(null, 0);
+    this.data.setCache(picasso.getCache());
   }
 
   /**
@@ -308,6 +310,16 @@ public class RequestCreator {
   }
 
   /**
+   * Temporary use a different cache instance
+   *
+   * @param cache the custom cache object to be used
+   */
+  public RequestCreator withCache(Cache cache) {
+    data.setCache(cache);
+    return this;
+  }
+
+  /**
    * Set the priority of this request.
    * <p>
    * This will affect the order in which the requests execute but does not guarantee it.
@@ -388,7 +400,7 @@ public class RequestCreator {
     String key = createKey(finalData, new StringBuilder());
 
     Action action = new GetAction(picasso, finalData, skipMemoryCache, key, tag, fadeTime);
-    return forRequest(picasso, picasso.dispatcher, picasso.cache, picasso.stats, action).hunt();
+    return forRequest(picasso, picasso.dispatcher, data.getCache(), picasso.stats, action).hunt();
   }
 
   /**
@@ -487,7 +499,7 @@ public class RequestCreator {
     String requestKey = createKey(request);
 
     if (!skipMemoryCache) {
-      Bitmap bitmap = picasso.quickMemoryCacheCheck(requestKey);
+      Bitmap bitmap = picasso.quickMemoryCacheCheck(data.getCache(), requestKey);
       if (bitmap != null) {
         picasso.cancelRequest(target);
         target.onBitmapLoaded(bitmap, MEMORY);
@@ -619,7 +631,7 @@ public class RequestCreator {
     String requestKey = createKey(request);
 
     if (!skipMemoryCache) {
-      Bitmap bitmap = picasso.quickMemoryCacheCheck(requestKey);
+      Bitmap bitmap = picasso.quickMemoryCacheCheck(data.getCache(), requestKey);
       if (bitmap != null) {
         picasso.cancelRequest(target);
         setBitmap(target, picasso.context, bitmap, MEMORY, fadeTime, picasso.indicatorsEnabled);
@@ -671,7 +683,7 @@ public class RequestCreator {
 
   private void performRemoteViewInto(RemoteViewsAction action) {
     if (!skipMemoryCache) {
-      Bitmap bitmap = picasso.quickMemoryCacheCheck(action.getKey());
+      Bitmap bitmap = picasso.quickMemoryCacheCheck(data.getCache(), action.getKey());
       if (bitmap != null) {
         action.complete(bitmap, MEMORY);
         return;
