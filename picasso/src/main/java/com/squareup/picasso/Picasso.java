@@ -394,6 +394,14 @@ public class Picasso {
     return stats.createSnapshot();
   }
 
+  public void clearCache() {
+    cache.clear();
+  }
+
+  public Cache getCache() {
+    return cache;
+  }
+
   /** Stops this instance from accepting further requests. */
   public void shutdown() {
     if (this == singleton) {
