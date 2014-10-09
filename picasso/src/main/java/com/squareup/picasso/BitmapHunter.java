@@ -129,6 +129,7 @@ class BitmapHunter implements Runnable {
     } catch (Exception e) {
       exception = e;
       dispatcher.dispatchFailed(this);
+      e.printStackTrace();
     } finally {
       Thread.currentThread().setName(Utils.THREAD_IDLE_NAME);
     }
@@ -136,6 +137,10 @@ class BitmapHunter implements Runnable {
 
   Bitmap hunt() throws IOException {
     Bitmap bitmap = null;
+
+    if (isCancelled()) {
+      return null;
+    }
 
     if (!skipMemoryCache) {
       bitmap = cache.get(key);
@@ -149,12 +154,20 @@ class BitmapHunter implements Runnable {
       }
     }
 
+    if (isCancelled()) {
+      return null;
+    }
+
     data.loadFromLocalCacheOnly = (retryCount == 0);
     RequestHandler.Result result = requestHandler.load(data);
     if (result != null) {
       bitmap = result.getBitmap();
       loadedFrom = result.getLoadedFrom();
       exifRotation = result.getExifOrientation();
+    }
+
+    if (isCancelled()) {
+      return null;
     }
 
     if (bitmap != null) {

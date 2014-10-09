@@ -48,6 +48,7 @@ import static com.squareup.picasso.Utils.VERB_DELIVERED;
 import static com.squareup.picasso.Utils.VERB_ENQUEUED;
 import static com.squareup.picasso.Utils.VERB_IGNORED;
 import static com.squareup.picasso.Utils.VERB_PAUSED;
+import static com.squareup.picasso.Utils.VERB_REMOVED;
 import static com.squareup.picasso.Utils.VERB_REPLAYING;
 import static com.squareup.picasso.Utils.VERB_RETRYING;
 import static com.squareup.picasso.Utils.getLogIdsForHunter;
@@ -190,6 +191,13 @@ class Dispatcher {
 
     BitmapHunter hunter = hunterMap.get(action.getKey());
     if (hunter != null) {
+      if(hunter.isCancelled() || action.isCancelled()){
+        if (action.getPicasso().loggingEnabled) {
+          log(OWNER_DISPATCHER, VERB_REMOVED, action.request.logId(), "action is cancelled");
+        }
+        hunterMap.remove(action.getKey());
+        return;
+      }
       hunter.attach(action);
       return;
     }
