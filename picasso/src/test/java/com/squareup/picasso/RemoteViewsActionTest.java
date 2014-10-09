@@ -24,8 +24,12 @@ import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
-import static com.squareup.picasso.Picasso.LoadedFrom.NETWORK;
-import static com.squareup.picasso.Picasso.RequestTransformer.IDENTITY;
+import it.sephiroth.android.library.picasso.Cache;
+import it.sephiroth.android.library.picasso.Picasso;
+import it.sephiroth.android.library.picasso.Request;
+
+import static it.sephiroth.android.library.picasso.Picasso.LoadedFrom.NETWORK;
+import static it.sephiroth.android.library.picasso.Picasso.RequestTransformer.IDENTITY;
 import static com.squareup.picasso.TestUtils.BITMAP_1;
 import static com.squareup.picasso.TestUtils.URI_KEY_1;
 import static org.mockito.Mockito.mock;

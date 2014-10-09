@@ -23,8 +23,12 @@ import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
-import static com.squareup.picasso.Picasso.LoadedFrom.MEMORY;
-import static com.squareup.picasso.Picasso.RequestTransformer.IDENTITY;
+import it.sephiroth.android.library.picasso.Cache;
+import it.sephiroth.android.library.picasso.Callback;
+import it.sephiroth.android.library.picasso.Picasso;
+
+import static it.sephiroth.android.library.picasso.Picasso.LoadedFrom.MEMORY;
+import static it.sephiroth.android.library.picasso.Picasso.RequestTransformer.IDENTITY;
 import static com.squareup.picasso.TestUtils.BITMAP_1;
 import static com.squareup.picasso.TestUtils.RESOURCE_ID_1;
 import static com.squareup.picasso.TestUtils.URI_KEY_1;

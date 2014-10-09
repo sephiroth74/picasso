@@ -23,6 +23,9 @@ import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
+import it.sephiroth.android.library.picasso.Request;
+import it.sephiroth.android.library.picasso.Transformation;
+
 import static com.squareup.picasso.TestUtils.RESOURCE_ID_1;
 import static com.squareup.picasso.TestUtils.RESOURCE_ID_URI;
 import static com.squareup.picasso.TestUtils.RESOURCE_TYPE_URI;

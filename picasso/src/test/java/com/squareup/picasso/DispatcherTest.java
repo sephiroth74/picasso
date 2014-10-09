@@ -31,6 +31,10 @@ import org.mockito.Mock;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
+import it.sephiroth.android.library.picasso.Cache;
+import it.sephiroth.android.library.picasso.Downloader;
+import it.sephiroth.android.library.picasso.Target;
+
 import static android.content.Context.CONNECTIVITY_SERVICE;
 import static android.content.Intent.ACTION_AIRPLANE_MODE_CHANGED;
 import static android.content.pm.PackageManager.PERMISSION_DENIED;
@@ -68,8 +72,10 @@ public class DispatcherTest {
   @Mock ConnectivityManager connectivityManager;
   @Mock ExecutorService service;
   @Mock Handler mainThreadHandler;
-  @Mock Downloader downloader;
-  @Mock Cache cache;
+  @Mock
+  Downloader downloader;
+  @Mock
+  Cache cache;
   @Mock Stats stats;
   private Dispatcher dispatcher;
 

@@ -32,11 +32,17 @@ import java.util.Arrays;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
+import it.sephiroth.android.library.picasso.Callback;
+import it.sephiroth.android.library.picasso.Picasso;
+import it.sephiroth.android.library.picasso.Request;
+import it.sephiroth.android.library.picasso.RequestHandler;
+import it.sephiroth.android.library.picasso.Target;
+
 import static android.content.ContentResolver.SCHEME_ANDROID_RESOURCE;
 import static android.provider.ContactsContract.Contacts.CONTENT_URI;
 import static android.provider.ContactsContract.Contacts.Photo.CONTENT_DIRECTORY;
-import static com.squareup.picasso.Picasso.LoadedFrom.MEMORY;
-import static com.squareup.picasso.Picasso.Priority;
+import static it.sephiroth.android.library.picasso.Picasso.LoadedFrom.MEMORY;
+import static it.sephiroth.android.library.picasso.Picasso.Priority;
 import static com.squareup.picasso.Utils.createKey;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doReturn;

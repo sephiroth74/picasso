@@ -9,11 +9,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 
-import com.squareup.picasso.Cache;
-import com.squareup.picasso.Callback;
-import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Request;
-import com.squareup.picasso.RequestHandler;
+import it.sephiroth.android.library.picasso.Cache;
+import it.sephiroth.android.library.picasso.Callback;
+import it.sephiroth.android.library.picasso.Picasso;
+import it.sephiroth.android.library.picasso.Request;
+import it.sephiroth.android.library.picasso.RequestHandler;
 
 import java.io.IOException;
 import java.io.InputStream;

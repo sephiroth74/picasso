@@ -10,6 +10,8 @@ import org.mockito.Mock;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
+import it.sephiroth.android.library.picasso.Request;
+
 import static com.squareup.picasso.Utils.createKey;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doReturn;

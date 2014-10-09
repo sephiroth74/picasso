@@ -30,8 +30,11 @@ import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
-import static com.squareup.picasso.OkHttpDownloader.RESPONSE_SOURCE_ANDROID;
-import static com.squareup.picasso.OkHttpDownloader.RESPONSE_SOURCE_OKHTTP;
+import it.sephiroth.android.library.picasso.Downloader;
+import it.sephiroth.android.library.picasso.OkHttpDownloader;
+
+import static it.sephiroth.android.library.picasso.OkHttpDownloader.RESPONSE_SOURCE_ANDROID;
+import static it.sephiroth.android.library.picasso.OkHttpDownloader.RESPONSE_SOURCE_OKHTTP;
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 

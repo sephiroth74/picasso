@@ -34,11 +34,18 @@ import org.robolectric.annotation.Config;
 import java.io.IOException;
 import java.util.concurrent.CountDownLatch;
 
-import static com.squareup.picasso.Picasso.LoadedFrom.MEMORY;
-import static com.squareup.picasso.Picasso.Priority.LOW;
-import static com.squareup.picasso.Picasso.Priority.HIGH;
-import static com.squareup.picasso.Picasso.Priority.NORMAL;
-import static com.squareup.picasso.Picasso.RequestTransformer.IDENTITY;
+import it.sephiroth.android.library.picasso.Cache;
+import it.sephiroth.android.library.picasso.Callback;
+import it.sephiroth.android.library.picasso.Picasso;
+import it.sephiroth.android.library.picasso.Request;
+import it.sephiroth.android.library.picasso.RequestCreator;
+import it.sephiroth.android.library.picasso.Target;
+
+import static it.sephiroth.android.library.picasso.Picasso.LoadedFrom.MEMORY;
+import static it.sephiroth.android.library.picasso.Picasso.Priority.LOW;
+import static it.sephiroth.android.library.picasso.Picasso.Priority.HIGH;
+import static it.sephiroth.android.library.picasso.Picasso.Priority.NORMAL;
+import static it.sephiroth.android.library.picasso.Picasso.RequestTransformer.IDENTITY;
 import static com.squareup.picasso.RemoteViewsAction.AppWidgetAction;
 import static com.squareup.picasso.RemoteViewsAction.NotificationAction;
 import static com.squareup.picasso.TestUtils.BITMAP_1;
@@ -71,7 +78,8 @@ import static org.mockito.MockitoAnnotations.initMocks;
 @Config(manifest = Config.NONE)
 public class RequestCreatorTest {
 
-  @Mock Picasso picasso;
+  @Mock
+  Picasso picasso;
   @Captor ArgumentCaptor<Action> actionCaptor;
 
   @Before public void shutUp() throws Exception {
