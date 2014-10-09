@@ -421,6 +421,12 @@ public class Picasso {
     return requestHandlers;
   }
 
+  /**
+   * Add a new custom request to the list of registered
+   * handlers. It will throw an exception if the handler is already registered
+   * @param handler
+   * @throws java.lang.IllegalStateException
+   */
   public void addRequestHandler(RequestHandler handler) {
     if (requestHandlers.contains(handler)) {
       throw new IllegalStateException("RequestHandler already registered.");
