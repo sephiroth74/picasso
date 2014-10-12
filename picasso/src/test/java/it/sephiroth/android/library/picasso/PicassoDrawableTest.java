@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.squareup.picasso;
+package it.sephiroth.android.library.picasso;
 
 import android.content.Context;
 import android.graphics.drawable.ColorDrawable;
@@ -27,7 +27,6 @@ import org.robolectric.annotation.Config;
 import static android.graphics.Color.RED;
 import static it.sephiroth.android.library.picasso.Picasso.LoadedFrom.DISK;
 import static it.sephiroth.android.library.picasso.Picasso.LoadedFrom.MEMORY;
-import static com.squareup.picasso.TestUtils.BITMAP_1;
 import static org.fest.assertions.api.Assertions.assertThat;
 
 @RunWith(RobolectricTestRunner.class)
@@ -37,22 +36,22 @@ public class PicassoDrawableTest {
   private final Drawable placeholder = new ColorDrawable(RED);
 
   @Test public void createWithNoPlaceholderAnimation() {
-    PicassoDrawable pd = new PicassoDrawable(context, BITMAP_1, null, DISK, 200, false);
-    assertThat(pd.getBitmap()).isSameAs(BITMAP_1);
+    PicassoDrawable pd = new PicassoDrawable(context, TestUtils.BITMAP_1, null, DISK, 200, false);
+    assertThat(pd.getBitmap()).isSameAs(TestUtils.BITMAP_1);
     assertThat(pd.placeholder).isNull();
     assertThat(pd.animating).isTrue();
   }
 
   @Test public void createWithPlaceholderAnimation() {
-    PicassoDrawable pd = new PicassoDrawable(context, BITMAP_1, placeholder, DISK, 200, false);
-    assertThat(pd.getBitmap()).isSameAs(BITMAP_1);
+    PicassoDrawable pd = new PicassoDrawable(context, TestUtils.BITMAP_1, placeholder, DISK, 200, false);
+    assertThat(pd.getBitmap()).isSameAs(TestUtils.BITMAP_1);
     assertThat(pd.placeholder).isSameAs(placeholder);
     assertThat(pd.animating).isTrue();
   }
 
   @Test public void createWithBitmapCacheHit() {
-    PicassoDrawable pd = new PicassoDrawable(context, BITMAP_1, placeholder, MEMORY, 200, false);
-    assertThat(pd.getBitmap()).isSameAs(BITMAP_1);
+    PicassoDrawable pd = new PicassoDrawable(context, TestUtils.BITMAP_1, placeholder, MEMORY, 200, false);
+    assertThat(pd.getBitmap()).isSameAs(TestUtils.BITMAP_1);
     assertThat(pd.placeholder).isNull();
     assertThat(pd.animating).isFalse();
   }

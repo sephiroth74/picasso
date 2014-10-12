@@ -1,4 +1,4 @@
-package com.squareup.picasso;
+package it.sephiroth.android.library.picasso;
 
 import android.content.Context;
 import android.net.Uri;
@@ -12,7 +12,7 @@ import org.robolectric.annotation.Config;
 
 import it.sephiroth.android.library.picasso.Request;
 
-import static com.squareup.picasso.Utils.createKey;
+import static it.sephiroth.android.library.picasso.Utils.createKey;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.spy;

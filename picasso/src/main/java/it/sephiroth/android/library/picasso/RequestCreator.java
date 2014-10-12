@@ -83,6 +83,7 @@ public class RequestCreator {
   private Drawable errorDrawable;
   private Object tag;
   private long delayMillis;
+  private boolean targetIsHidden;
 
   RequestCreator(Picasso picasso, Uri uri, int resourceId) {
     if (picasso.shutdown) {
@@ -199,9 +200,25 @@ public class RequestCreator {
    * <em>Note:</em> This method works only when your target is an {@link ImageView}.
    */
   public RequestCreator fit() {
-    deferred = true;
-    return this;
+    return fit(false);
   }
+
+  /**
+   * Same as {@link #fit()} but an optional boolean parameter can be passed. This is useful when
+   * the target view (or one of its parent) is hidden (like a child in a ViewAnimator) 
+   * because otherwise picasso
+   * fails to get the correct width/height of the view. When this parameter is set to true, the
+   * width and the height of the view will be generated using getMeasuredWidth/Height instead of
+   * getWidth/Height.
+   * @param targetIsHidden
+   * @see #fit()
+   * @return
+   */
+  public RequestCreator fit(boolean targetIsHidden) {
+    deferred = true;
+    this.targetIsHidden = targetIsHidden;
+    return this;
+  }  
 
   /** Internal use only. Used by {@link DeferredRequestCreator}. */
   RequestCreator unfit() {
@@ -624,7 +641,7 @@ public class RequestCreator {
       }
 
       int width, height;
-      if (target.getVisibility() == View.GONE) {
+      if (target.getVisibility() == View.GONE || targetIsHidden) {
         // if the view is hidden and it was never rendered
         // there's a chance that getWidth/getHeight will be always 0
         width = target.getMeasuredWidth();
@@ -634,9 +651,9 @@ public class RequestCreator {
         height = target.getHeight();
       }
 
-      if (width == 0 || height == 0) {
+      if (width <= 0 || height <= 0) {
         setPlaceholder(target, placeholderResId, placeholderDrawable);
-        picasso.defer(target, new DeferredRequestCreator(this, target, callback));
+        picasso.defer(target, new DeferredRequestCreator(this, target, targetIsHidden, callback));
         return;
       }
       data.resize(width, height);

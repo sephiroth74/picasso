@@ -1,4 +1,4 @@
-package com.squareup.picasso;
+package it.sephiroth.android.library.picasso;
 
 import android.content.ContentResolver;
 import android.content.Context;
@@ -11,17 +11,11 @@ import org.mockito.Mock;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
-import it.sephiroth.android.library.picasso.Request;
-
-import static com.squareup.picasso.MediaStoreRequestHandler.PicassoKind.FULL;
-import static com.squareup.picasso.MediaStoreRequestHandler.PicassoKind.MICRO;
-import static com.squareup.picasso.MediaStoreRequestHandler.PicassoKind.MINI;
-import static com.squareup.picasso.MediaStoreRequestHandler.getPicassoKind;
-import static com.squareup.picasso.TestUtils.IMAGE_THUMBNAIL_1;
-import static com.squareup.picasso.TestUtils.MEDIA_STORE_CONTENT_1_URL;
-import static com.squareup.picasso.TestUtils.MEDIA_STORE_CONTENT_KEY_1;
-import static com.squareup.picasso.TestUtils.VIDEO_THUMBNAIL_1;
-import static com.squareup.picasso.TestUtils.mockAction;
+import static it.sephiroth.android.library.picasso.MediaStoreRequestHandler.PicassoKind.FULL;
+import static it.sephiroth.android.library.picasso.MediaStoreRequestHandler.PicassoKind.MICRO;
+import static it.sephiroth.android.library.picasso.MediaStoreRequestHandler.PicassoKind.MINI;
+import static it.sephiroth.android.library.picasso.MediaStoreRequestHandler.getPicassoKind;
+import static it.sephiroth.android.library.picasso.TestUtils.mockAction;
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
@@ -40,19 +34,19 @@ public class MediaStoreRequestHandlerTest {
   }
 
   @Test public void decodesVideoThumbnailWithVideoMimeType() throws Exception {
-    Request request = new Request.Builder(MEDIA_STORE_CONTENT_1_URL, 0).resize(100, 100).build();
-    Action action = mockAction(MEDIA_STORE_CONTENT_KEY_1, request);
+    Request request = new Request.Builder(TestUtils.MEDIA_STORE_CONTENT_1_URL, 0).resize(100, 100).build();
+    Action action = TestUtils.mockAction(TestUtils.MEDIA_STORE_CONTENT_KEY_1, request);
     MediaStoreRequestHandler requestHandler = create("video/", action);
     Bitmap result = requestHandler.load(action.getRequest()).getBitmap();
-    assertThat(result).isEqualTo(VIDEO_THUMBNAIL_1);
+    assertThat(result).isEqualTo(TestUtils.VIDEO_THUMBNAIL_1);
   }
 
   @Test public void decodesImageThumbnailWithImageMimeType() throws Exception {
-    Request request = new Request.Builder(MEDIA_STORE_CONTENT_1_URL, 0).resize(100, 100).build();
-    Action action = mockAction(MEDIA_STORE_CONTENT_KEY_1, request);
+    Request request = new Request.Builder(TestUtils.MEDIA_STORE_CONTENT_1_URL, 0).resize(100, 100).build();
+    Action action = TestUtils.mockAction(TestUtils.MEDIA_STORE_CONTENT_KEY_1, request);
     MediaStoreRequestHandler requestHandler = create("image/png", action);
     Bitmap result = requestHandler.load(action.getRequest()).getBitmap();
-    assertThat(result).isEqualTo(IMAGE_THUMBNAIL_1);
+    assertThat(result).isEqualTo(TestUtils.IMAGE_THUMBNAIL_1);
   }
 
   @Test public void getPicassoKindMicro() throws Exception {

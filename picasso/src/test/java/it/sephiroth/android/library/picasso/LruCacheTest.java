@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.squareup.picasso;
+package it.sephiroth.android.library.picasso;
 
 import android.graphics.Bitmap;
 import java.util.ArrayList;

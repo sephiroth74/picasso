@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.squareup.picasso;
+package it.sephiroth.android.library.picasso;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -22,13 +22,10 @@ import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
-import it.sephiroth.android.library.picasso.Request;
-
 import static android.graphics.Bitmap.Config.RGB_565;
 import static it.sephiroth.android.library.picasso.RequestHandler.calculateInSampleSize;
 import static it.sephiroth.android.library.picasso.RequestHandler.createBitmapOptions;
 import static it.sephiroth.android.library.picasso.RequestHandler.requiresInSampleSize;
-import static com.squareup.picasso.TestUtils.URI_1;
 import static org.fest.assertions.api.Assertions.assertThat;
 
 @RunWith(RobolectricTestRunner.class)
@@ -37,7 +34,7 @@ public class RequestHandlerTest {
 
   @Test public void bitmapConfig() throws Exception {
     for (Bitmap.Config config : Bitmap.Config.values()) {
-      Request data = new Request.Builder(URI_1).config(config).build();
+      Request data = new Request.Builder(TestUtils.URI_1).config(config).build();
       Request copy = data.buildUpon().build();
 
       assertThat(createBitmapOptions(data).inPreferredConfig).isSameAs(config);
@@ -56,35 +53,35 @@ public class RequestHandlerTest {
 
   @Test public void calculateInSampleSizeNoResize() {
     final BitmapFactory.Options options = new BitmapFactory.Options();
-    Request data = new Request.Builder(URI_1).build();
+    Request data = new Request.Builder(TestUtils.URI_1).build();
     calculateInSampleSize(100, 100, 150, 150, options, data);
     assertThat(options.inSampleSize).isEqualTo(1);
   }
 
   @Test public void calculateInSampleSizeResize() {
     final BitmapFactory.Options options = new BitmapFactory.Options();
-    Request data = new Request.Builder(URI_1).build();
+    Request data = new Request.Builder(TestUtils.URI_1).build();
     calculateInSampleSize(100, 100, 200, 200, options, data);
     assertThat(options.inSampleSize).isEqualTo(2);
   }
 
   @Test public void calculateInSampleSizeResizeCenterInside() {
     final BitmapFactory.Options options = new BitmapFactory.Options();
-    Request data = new Request.Builder(URI_1).centerInside().resize(100, 100).build();
+    Request data = new Request.Builder(TestUtils.URI_1).centerInside().resize(100, 100).build();
     calculateInSampleSize(data.targetWidth, data.targetHeight, 400, 200, options, data);
     assertThat(options.inSampleSize).isEqualTo(4);
   }
 
   @Test public void nullBitmapOptionsIfNoResizing() {
     // No resize must return no bitmap options
-    final Request noResize = new Request.Builder(URI_1).build();
+    final Request noResize = new Request.Builder(TestUtils.URI_1).build();
     final BitmapFactory.Options noResizeOptions = createBitmapOptions(noResize);
     assertThat(noResizeOptions).isNull();
   }
 
   @Test public void inJustDecodeBoundsIfResizing() {
     // Resize must return bitmap options with inJustDecodeBounds = true
-    final Request requiresResize = new Request.Builder(URI_1).resize(20, 15).build();
+    final Request requiresResize = new Request.Builder(TestUtils.URI_1).resize(20, 15).build();
     final BitmapFactory.Options resizeOptions = createBitmapOptions(requiresResize);
     assertThat(resizeOptions).isNotNull();
     assertThat(resizeOptions.inJustDecodeBounds).isTrue();
@@ -92,7 +89,7 @@ public class RequestHandlerTest {
 
   @Test public void createWithConfigAndNotInJustDecodeBounds() {
     // Given a config must return bitmap options and false inJustDecodeBounds
-    final Request config = new Request.Builder(URI_1).config(RGB_565).build();
+    final Request config = new Request.Builder(TestUtils.URI_1).config(RGB_565).build();
     final BitmapFactory.Options configOptions = createBitmapOptions(config);
     assertThat(configOptions).isNotNull();
     assertThat(configOptions.inJustDecodeBounds).isFalse();
