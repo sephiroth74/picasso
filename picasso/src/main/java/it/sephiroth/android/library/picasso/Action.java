@@ -39,7 +39,8 @@ abstract class Action<T> {
       int errorResId, Drawable errorDrawable, String key, Object tag) {
     this.picasso = picasso;
     this.request = request;
-    this.target = new RequestWeakReference<T>(this, target, picasso.referenceQueue);
+    this.target =
+        target == null ? null : new RequestWeakReference<T>(this, target, picasso.referenceQueue);
     this.skipCache = skipCache;
     this.fadeTime = fadeTime;
     this.errorResId = errorResId;
