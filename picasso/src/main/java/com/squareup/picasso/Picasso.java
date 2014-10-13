@@ -25,7 +25,6 @@ import android.os.Message;
 import android.os.Process;
 import android.widget.ImageView;
 import android.widget.RemoteViews;
-
 import java.io.File;
 import java.lang.ref.ReferenceQueue;
 import java.util.ArrayList;
@@ -41,6 +40,13 @@ import static com.squareup.picasso.Dispatcher.REQUEST_BATCH_RESUME;
 import static com.squareup.picasso.Dispatcher.REQUEST_COMPLETE;
 import static com.squareup.picasso.Dispatcher.REQUEST_GCED;
 import static com.squareup.picasso.Picasso.LoadedFrom.MEMORY;
+import static com.squareup.picasso.Utils.OWNER_MAIN;
+import static com.squareup.picasso.Utils.THREAD_PREFIX;
+import static com.squareup.picasso.Utils.VERB_CANCELED;
+import static com.squareup.picasso.Utils.VERB_COMPLETED;
+import static com.squareup.picasso.Utils.VERB_ERRORED;
+import static com.squareup.picasso.Utils.VERB_RESUMED;
+import static com.squareup.picasso.Utils.checkMain;
 import static com.squareup.picasso.Utils.log;
 
 /**
@@ -112,6 +118,9 @@ public class Picasso {
         }
         case REQUEST_GCED: {
           Action action = (Action) msg.obj;
+          if (action.getPicasso().loggingEnabled) {
+            log(OWNER_MAIN, VERB_CANCELED, action.request.logId(), "target got garbage collected");
+          }
           action.picasso.cancelExistingRequest(action.getTarget());
           break;
         }
@@ -218,7 +227,7 @@ public class Picasso {
    * @see RequestCreator#tag(Object)
    */
   public void cancelTag(Object tag) {
-    Utils.checkMain();
+    checkMain();
     List<Action> actions = new ArrayList<Action>(targetToAction.values());
     for (int i = 0, n = actions.size(); i < n; i++) {
       Action action = actions.get(i);
@@ -520,13 +529,13 @@ public class Picasso {
       // Resumed action is cached, complete immediately.
       deliverAction(bitmap, MEMORY, action);
       if (loggingEnabled) {
-        Utils.log(Utils.OWNER_MAIN, Utils.VERB_COMPLETED, action.request.logId(), "from " + MEMORY);
+        log(OWNER_MAIN, VERB_COMPLETED, action.request.logId(), "from " + MEMORY);
       }
     } else {
       // Re-submit the action to the executor.
       enqueueAndSubmit(action, 0);
       if (loggingEnabled) {
-        Utils.log(Utils.OWNER_MAIN, Utils.VERB_RESUMED, action.request.logId());
+        log(OWNER_MAIN, VERB_RESUMED, action.request.logId());
       }
     }
   }
@@ -544,18 +553,18 @@ public class Picasso {
       }
       action.complete(result, from);
       if (loggingEnabled) {
-        Utils.log(Utils.OWNER_MAIN, Utils.VERB_COMPLETED, action.request.logId(), "from " + from);
+        log(OWNER_MAIN, VERB_COMPLETED, action.request.logId(), "from " + from);
       }
     } else {
       action.error();
       if (loggingEnabled) {
-        Utils.log(Utils.OWNER_MAIN, Utils.VERB_ERRORED, action.request.logId());
+        log(OWNER_MAIN, VERB_ERRORED, action.request.logId());
       }
     }
   }
 
   private void cancelExistingRequest(Object target) {
-    Utils.checkMain();
+    checkMain();
     Action action = targetToAction.remove(target);
     if (action != null) {
       action.cancel();
@@ -588,7 +597,7 @@ public class Picasso {
       this.referenceQueue = referenceQueue;
       this.handler = handler;
       setDaemon(true);
-      setName(Utils.THREAD_PREFIX + "refQueue");
+      setName(THREAD_PREFIX + "refQueue");
     }
 
     @Override public void run() {

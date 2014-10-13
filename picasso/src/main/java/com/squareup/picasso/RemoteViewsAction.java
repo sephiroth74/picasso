@@ -22,15 +22,18 @@ import android.graphics.Bitmap;
 import android.widget.RemoteViews;
 
 import static android.content.Context.NOTIFICATION_SERVICE;
+import static com.squareup.picasso.Utils.getService;
 
 abstract class RemoteViewsAction extends Action<RemoteViewsAction.RemoteViewsTarget> {
   final RemoteViews remoteViews;
   final int viewId;
 
+  private RemoteViewsTarget target;
+
   RemoteViewsAction(Picasso picasso, Request data, RemoteViews remoteViews, int viewId,
       int errorResId, boolean skipCache, String key, Object tag, long fadeTime) {
-    super(picasso, new RemoteViewsTarget(remoteViews, viewId), data, skipCache, fadeTime,
-            errorResId, null, key, tag);
+    super(picasso, null, data, skipCache, fadeTime, errorResId,
+        null, key, tag);
     this.remoteViews = remoteViews;
     this.viewId = viewId;
   }
@@ -44,6 +47,13 @@ abstract class RemoteViewsAction extends Action<RemoteViewsAction.RemoteViewsTar
     if (errorResId != 0) {
       setImageResource(errorResId);
     }
+  }
+
+  @Override RemoteViewsTarget getTarget() {
+    if (target == null) {
+      target = new RemoteViewsTarget(remoteViews, viewId);
+    }
+    return target;
   }
 
   void setImageResource(int resId) {
@@ -104,7 +114,7 @@ abstract class RemoteViewsAction extends Action<RemoteViewsAction.RemoteViewsTar
     }
 
     @Override void update() {
-      NotificationManager manager = Utils.getService(picasso.context, NOTIFICATION_SERVICE);
+      NotificationManager manager = getService(picasso.context, NOTIFICATION_SERVICE);
       manager.notify(notificationId, notification);
     }
   }
