@@ -3,7 +3,7 @@ package com.example.picasso;
 import android.content.Context;
 import android.widget.AbsListView;
 
-import it.sephiroth.android.library.picasso.Picasso;
+import com.squareup.picasso.Picasso;
 
 public class SampleScrollListener implements AbsListView.OnScrollListener {
   private final Context context;

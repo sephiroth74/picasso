@@ -19,7 +19,7 @@ import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.Context;
 import android.widget.RemoteViews;
-import it.sephiroth.android.library.picasso.Picasso;
+import com.squareup.picasso.Picasso;
 import java.util.Random;
 
 public class SampleWidgetProvider extends AppWidgetProvider {
