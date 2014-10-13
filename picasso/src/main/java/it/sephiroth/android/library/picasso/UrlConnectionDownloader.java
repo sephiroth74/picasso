@@ -25,8 +25,6 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-import static it.sephiroth.android.library.picasso.Utils.parseResponseSourceHeader;
-
 /**
  * A {@link Downloader} which uses {@link HttpURLConnection} to download images. A disk cache of 2%
  * of the total available space will be used (capped at 50MB) will automatically be installed in the
@@ -69,7 +67,7 @@ public class UrlConnectionDownloader implements Downloader {
     }
 
     long contentLength = connection.getHeaderFieldInt("Content-Length", -1);
-    boolean fromCache = parseResponseSourceHeader(connection.getHeaderField(RESPONSE_SOURCE));
+    boolean fromCache = Utils.parseResponseSourceHeader(connection.getHeaderField(RESPONSE_SOURCE));
 
     return new Response(connection.getInputStream(), fromCache, contentLength);
   }
@@ -88,8 +86,8 @@ public class UrlConnectionDownloader implements Downloader {
     }
   }
 
+  @TargetApi(14)
   private static class ResponseCacheIcs {
-    @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
     static Object install(Context context) throws IOException {
       File cacheDir = Utils.createDefaultCacheDir(context);
       HttpResponseCache cache = HttpResponseCache.getInstalled();

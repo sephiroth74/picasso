@@ -3,7 +3,7 @@
 set -ex
 
 REPO="git@github.com:square/picasso.git"
-GROUP_ID="it.sephiroth.android.library.picasso"
+GROUP_ID="com.squareup.picasso"
 ARTIFACT_ID="picasso"
 
 DIR=temp-clone

@@ -36,6 +36,7 @@ import static it.sephiroth.android.library.picasso.Picasso.LoadedFrom.MEMORY;
 final class PicassoDrawable extends BitmapDrawable {
   // Only accessed from main thread.
   private static final Paint DEBUG_PAINT = new Paint();
+  private static final float FADE_DURATION = 200f; //ms
 
   /**
    * Create or update the drawable on the target {@link ImageView} to display the supplied bitmap
@@ -86,10 +87,9 @@ final class PicassoDrawable extends BitmapDrawable {
     this.density = context.getResources().getDisplayMetrics().density;
 
     this.loadedFrom = loadedFrom;
-
     this.fadeTime = fadeTime;
 
-    boolean fade = loadedFrom != MEMORY && this.fadeTime > 0;
+    boolean fade = loadedFrom != MEMORY && fadeTime > 0;
     if (fade) {
       this.placeholder = placeholder;
       animating = true;

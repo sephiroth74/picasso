@@ -1,7 +1,9 @@
-apply plugin: 'android-library'
+apply plugin: 'com.android.library'
+
 
 group GROUP
 version VERSION_NAME
+
 
 dependencies {
     compile 'com.squareup.okhttp:okhttp:1.6.0'
@@ -9,9 +11,11 @@ dependencies {
     compile 'com.intellij:annotations:12.0'
 }
 
+
 android {
     compileSdkVersion Integer.parseInt(ANDROID_BUILD_SDK_VERSION)
     buildToolsVersion ANDROID_BUILD_TOOLS_VERSION
+
 
     defaultConfig {
         minSdkVersion 9
@@ -20,6 +24,7 @@ android {
         versionName version
     }
 
+
     buildTypes {
         release {
             runProguard false
@@ -27,6 +32,7 @@ android {
         }
     }
 }
+
 
 android.libraryVariants.all { variant ->
     task("generate${variant.name.capitalize()}Javadoc", type: Javadoc) {
@@ -40,5 +46,6 @@ android.libraryVariants.all { variant ->
         exclude '**/R.java'
     }
 }
+
 
 apply from: 'https://raw.githubusercontent.com/sephiroth74/gradle-mvn-push/master/gradle-mvn-push.gradle'

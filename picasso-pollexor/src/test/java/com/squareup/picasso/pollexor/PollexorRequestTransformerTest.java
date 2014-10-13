@@ -1,14 +1,14 @@
-package it.sephiroth.android.library.picasso.pollexor;
+package com.squareup.picasso.pollexor;
 
 import android.net.Uri;
-import it.sephiroth.android.library.picasso.Request;
+import com.squareup.picasso.Request;
 import com.squareup.pollexor.Thumbor;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
-import static it.sephiroth.android.library.picasso.Picasso.RequestTransformer;
+import static com.squareup.picasso.Picasso.RequestTransformer;
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.robolectric.annotation.Config.NONE;
 

@@ -21,8 +21,8 @@ import android.graphics.drawable.Drawable;
 final class TargetAction extends Action<Target> {
 
   TargetAction(Picasso picasso, Target target, Request data, boolean skipCache,
-        long fadeTime, int errorResId, Drawable errorDrawable, String key) {
-    super(picasso, target, data, skipCache, fadeTime, errorResId, errorDrawable, key);
+        int errorResId, Drawable errorDrawable, String key, Object tag, long fadeTime) {
+    super(picasso, target, data, skipCache, fadeTime, errorResId, errorDrawable, key, tag);
   }
 
   @Override void complete(Bitmap result, Picasso.LoadedFrom from) {

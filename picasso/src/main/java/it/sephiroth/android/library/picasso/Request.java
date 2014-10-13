@@ -16,9 +16,8 @@
 package it.sephiroth.android.library.picasso;
 
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
-
+import it.sephiroth.android.library.picasso.Picasso.Priority;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -33,6 +32,8 @@ public final class Request {
   int id;
   /** The time that the request was first submitted (in nanos). */
   long started;
+  /** Whether or not this request should only load from local cache. */
+  boolean loadFromLocalCacheOnly;
 
   /**
    * The image URI.
@@ -81,19 +82,19 @@ public final class Request {
   public final boolean hasRotationPivot;
   /** Target image config for decoding. */
   public final Bitmap.Config config;
-  /** custom generator */
-  public final Generator generator;
+  /** The priority of this request. */
+  public final Priority priority;
   /** cache to be used */
   public final Cache cache;
+  /** optional disk cache */
   public final Cache diskCache;
-  /** Use this options instead of generating new ones every time */
-  public final BitmapFactory.Options options;
 
   private Request(Uri uri, int resourceId, List<Transformation> transformations, int targetWidth,
-      int targetHeight, boolean resizeOnlyIfBigger, boolean centerCrop, boolean centerInside,
-      boolean resizeByMaxSide,
-      float rotationDegrees, float rotationPivotX, float rotationPivotY, boolean hasRotationPivot,
-      Bitmap.Config config, Generator generator, Cache cache, Cache diskCache, BitmapFactory.Options options) {
+      int targetHeight, boolean centerCrop, boolean centerInside, float rotationDegrees,
+      boolean resizeOnlyIfBigger, boolean resizeByMaxSide,
+      float rotationPivotX, float rotationPivotY, boolean hasRotationPivot, Bitmap.Config config,
+      Priority priority,
+      Cache cache, Cache diskCache) {
     this.uri = uri;
     this.resourceId = resourceId;
     if (transformations == null) {
@@ -112,10 +113,9 @@ public final class Request {
     this.resizeOnlyIfBigger = resizeOnlyIfBigger;
     this.resizeByMaxSide = resizeByMaxSide;
     this.config = config;
-    this.generator = generator;
+    this.priority = priority;
     this.cache = cache;
     this.diskCache = diskCache;
-	this.options = options;
   }
 
   @Override public String toString() {
@@ -168,17 +168,13 @@ public final class Request {
 
   String getName() {
     if (uri != null) {
-      return uri.getPath();
+      return String.valueOf(uri.getPath());
     }
     return Integer.toHexString(resourceId);
   }
 
   public boolean hasSize() {
     return targetWidth != 0;
-  }
-
-  public boolean hasGenerator() {
-    return null != generator;
   }
 
   boolean needsTransformation() {
@@ -212,11 +208,10 @@ public final class Request {
     private boolean hasRotationPivot;
     private List<Transformation> transformations;
     private Bitmap.Config config;
+    private Priority priority;
     private boolean resizeOnlyIfBigger;
-    private Generator generator;
     private Cache cache;
     private Cache diskCache;
-	private BitmapFactory.Options options;
 
     /** Start building a request using the specified {@link Uri}. */
     public Builder(Uri uri) {
@@ -249,9 +244,9 @@ public final class Request {
         transformations = new ArrayList<Transformation>(request.transformations);
       }
       config = request.config;
+      priority = request.priority;
       cache = request.cache;
       diskCache = request.diskCache;
-	  options = request.options;
     }
 
     boolean hasImage() {
@@ -260,6 +255,10 @@ public final class Request {
 
     boolean hasSize() {
       return targetWidth != 0;
+    }
+
+    boolean hasPriority() {
+      return priority != null;
     }
 
     /**
@@ -319,12 +318,6 @@ public final class Request {
       return this;
     }
 
-    /** Clear the center crop transformation flag, if set. */
-    public Builder clearResizeByMaxSide() {
-      resizeByMaxSide = false;
-      return this;
-    }
-
     /** Clear the resize transformation, if any. This will also clear center crop/inside if set. */
     public Builder clearResize() {
       targetWidth = 0;
@@ -332,13 +325,14 @@ public final class Request {
       centerCrop = false;
       centerInside = false;
       resizeOnlyIfBigger = false;
+      resizeByMaxSide = false;
       return this;
     }
 
     /**
-     * Crops an image inside of the bounds specified by {@link #resize(int, int, boolean)}
-     * rather than distorting the aspect ratio. This cropping technique scales the image so
-     * that it fills the requested bounds and then crops the extra.
+     * Crops an image inside of the bounds specified by {@link #resize(int, int)} rather than
+     * distorting the aspect ratio. This cropping technique scales the image so that it fills the
+     * requested bounds and then crops the extra.
      */
     public Builder centerCrop() {
       if (centerInside || resizeByMaxSide) {
@@ -356,8 +350,8 @@ public final class Request {
     }
 
     /**
-     * Centers an image inside of the bounds specified by {@link #resize(int, int, boolean)}.
-     * This scales the image so that both dimensions are equal to or less than the requested bounds.
+     * Centers an image inside of the bounds specified by {@link #resize(int, int)}. This scales
+     * the image so that both dimensions are equal to or less than the requested bounds.
      */
     public Builder centerInside() {
       if (centerCrop || resizeByMaxSide) {
@@ -404,23 +398,8 @@ public final class Request {
       return this;
     }
 
-	public Builder options(BitmapFactory.Options options) {
-	  this.options = options;
-      return this;
-	}
-
-    public Builder setGenerator(Generator generator) {
-      this.generator = generator;
-      return this;
-    }
-
     public Builder setCache(Cache cache) {
       this.cache = cache;
-      return this;
-    }
-
-    public Builder setDiskCache(Cache cache) {
-      this.diskCache = cache;
       return this;
     }
 
@@ -428,8 +407,25 @@ public final class Request {
       return this.cache;
     }
 
+    public Builder setDiskCache(Cache cache) {
+      this.diskCache = cache;
+      return this;
+    }
+
     public Cache getDiskCache() {
       return this.diskCache;
+    }
+
+    /** Execute request using the specified priority. */
+    public Builder priority(Priority priority) {
+      if (priority == null) {
+        throw new IllegalArgumentException("Priority invalid.");
+      }
+      if (this.priority != null) {
+        throw new IllegalStateException("Priority already set.");
+      }
+      this.priority = priority;
+      return this;
     }
 
     /**
@@ -459,24 +455,26 @@ public final class Request {
       if (centerCrop && resizeByMaxSide) {
         throw new IllegalStateException("Center crop and resize by max side can not be used together.");
       }
-
       if (centerCrop && targetWidth == 0) {
         throw new IllegalStateException("Center crop requires calling resize.");
       }
-
       if (centerInside && targetWidth == 0) {
         throw new IllegalStateException("Center inside requires calling resize.");
       }
-
-      if(resizeByMaxSide && targetWidth == 0) {
-        throw new IllegalStateException("Resize by max side requires calling resize.");
+      if (resizeByMaxSide) {
+        if (targetWidth == 0 || targetHeight == 0) {
+          throw new IllegalStateException("Resize by max side requires target width and height &gt; 0");
+        }
       }
-
-      return new Request(uri, resourceId, transformations, targetWidth, targetHeight,
-          resizeOnlyIfBigger, centerCrop, centerInside,
-          resizeByMaxSide,
-          rotationDegrees, rotationPivotX, rotationPivotY, hasRotationPivot, config, generator,
-          cache, diskCache, options);
+      if (priority == null) {
+        priority = Priority.NORMAL;
+      }
+      return new Request(uri, resourceId, transformations, targetWidth, targetHeight, centerCrop,
+              centerInside, rotationDegrees,
+              resizeOnlyIfBigger, resizeByMaxSide,
+              rotationPivotX, rotationPivotY, hasRotationPivot, config,
+              priority,
+              cache, diskCache);
     }
   }
 }

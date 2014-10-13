@@ -17,18 +17,10 @@ package it.sephiroth.android.library.picasso;
 
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
-import java.lang.ref.ReferenceQueue;
+
 import java.lang.ref.WeakReference;
 
 abstract class Action<T> {
-  static class RequestWeakReference<T> extends WeakReference<T> {
-    final Action action;
-
-    public RequestWeakReference(Action action, T referent, ReferenceQueue<? super T> q) {
-      super(referent, q);
-      this.action = action;
-    }
-  }
 
   final Picasso picasso;
   final Request request;
@@ -37,13 +29,14 @@ abstract class Action<T> {
   final int errorResId;
   final Drawable errorDrawable;
   final String key;
-  final long fadeTime;
+  final Object tag;
+  long fadeTime;
 
   boolean willReplay;
   boolean cancelled;
 
   Action(Picasso picasso, T target, Request request, boolean skipCache, long fadeTime,
-      int errorResId, Drawable errorDrawable, String key) {
+      int errorResId, Drawable errorDrawable, String key, Object tag) {
     this.picasso = picasso;
     this.request = request;
     this.target = new RequestWeakReference<T>(this, target, picasso.referenceQueue);
@@ -52,6 +45,7 @@ abstract class Action<T> {
     this.errorResId = errorResId;
     this.errorDrawable = errorDrawable;
     this.key = key;
+    this.tag = (tag != null ? tag : this);
   }
 
   abstract void complete(Bitmap result, Picasso.LoadedFrom from);
@@ -84,5 +78,13 @@ abstract class Action<T> {
 
   Picasso getPicasso() {
     return picasso;
+  }
+
+  Picasso.Priority getPriority() {
+    return request.priority;
+  }
+
+  Object getTag() {
+    return tag;
   }
 }

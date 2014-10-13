@@ -24,8 +24,6 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-import static it.sephiroth.android.library.picasso.Utils.parseResponseSourceHeader;
-
 /** A {@link Downloader} which uses OkHttp to download images. */
 public class OkHttpDownloader implements Downloader {
   static final String RESPONSE_SOURCE_ANDROID = "X-Android-Response-Source";
@@ -114,7 +112,7 @@ public class OkHttpDownloader implements Downloader {
     }
 
     long contentLength = connection.getHeaderFieldInt("Content-Length", -1);
-    boolean fromCache = parseResponseSourceHeader(responseSource);
+    boolean fromCache = Utils.parseResponseSourceHeader(responseSource);
 
     return new Response(connection.getInputStream(), fromCache, contentLength);
   }

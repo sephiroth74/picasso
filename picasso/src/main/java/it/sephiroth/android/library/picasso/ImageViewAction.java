@@ -25,8 +25,9 @@ class ImageViewAction extends Action<ImageView> {
   Callback callback;
 
   ImageViewAction(Picasso picasso, ImageView imageView, Request data, boolean skipCache,
-      long fadeTime, int errorResId, Drawable errorDrawable, String key, Callback callback) {
-    super(picasso, imageView, data, skipCache, fadeTime, errorResId, errorDrawable, key);
+      long fadeTime, int errorResId, Drawable errorDrawable, String key, Object tag,
+      Callback callback) {
+    super(picasso, imageView, data, skipCache, fadeTime, errorResId, errorDrawable, key, tag);
     this.callback = callback;
   }
 

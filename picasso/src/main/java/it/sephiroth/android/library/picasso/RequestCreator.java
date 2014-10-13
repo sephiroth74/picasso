@@ -25,27 +25,20 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.RemoteViews;
 
-import org.jetbrains.annotations.TestOnly;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
+import org.jetbrains.annotations.TestOnly;
 
 import static it.sephiroth.android.library.picasso.BitmapHunter.forRequest;
 import static it.sephiroth.android.library.picasso.Picasso.LoadedFrom.MEMORY;
+import static it.sephiroth.android.library.picasso.Picasso.Priority;
 import static it.sephiroth.android.library.picasso.PicassoDrawable.setBitmap;
 import static it.sephiroth.android.library.picasso.PicassoDrawable.setPlaceholder;
 import static it.sephiroth.android.library.picasso.RemoteViewsAction.AppWidgetAction;
 import static it.sephiroth.android.library.picasso.RemoteViewsAction.NotificationAction;
-import static it.sephiroth.android.library.picasso.Utils.OWNER_MAIN;
-import static it.sephiroth.android.library.picasso.Utils.VERB_CHANGED;
-import static it.sephiroth.android.library.picasso.Utils.VERB_COMPLETED;
-import static it.sephiroth.android.library.picasso.Utils.VERB_CREATED;
-import static it.sephiroth.android.library.picasso.Utils.checkMain;
-import static it.sephiroth.android.library.picasso.Utils.checkNotMain;
 import static it.sephiroth.android.library.picasso.Utils.createKey;
-import static it.sephiroth.android.library.picasso.Utils.isMain;
 import static it.sephiroth.android.library.picasso.Utils.log;
 
 /** Fluent API for building an image download request. */
@@ -54,7 +47,7 @@ public class RequestCreator {
   private static int nextId = 0;
 
   private static int getRequestId() {
-    if (isMain()) {
+    if (Utils.isMain()) {
       return nextId++;
     }
 
@@ -82,12 +75,13 @@ public class RequestCreator {
   private final Request.Builder data;
 
   private boolean skipMemoryCache;
+  private long fadeTime = Utils.FADE_TIME;
   private boolean deferred;
   private int placeholderResId;
   private int errorResId;
   private Drawable placeholderDrawable;
   private Drawable errorDrawable;
-  private long fadeTime = Utils.FADE_TIME;
+  private Object tag;
   private long delayMillis;
   private boolean targetIsHidden;
 
@@ -103,7 +97,6 @@ public class RequestCreator {
         uri = Uri.fromFile(new File(uri.getPath()));
       }
     }
-
     this.picasso = picasso;
     this.data = new Request.Builder(uri, resourceId);
     this.data.setCache(picasso.getCache());
@@ -172,6 +165,35 @@ public class RequestCreator {
   }
 
   /**
+   * Assign a tag to this request. Tags are an easy way to logically associate
+   * related requests that can be managed together e.g. paused, resumed,
+   * or canceled.
+   * <p>
+   * You can either use simple {@link String} tags or objects that naturally
+   * define the scope of your requests within your app such as a
+   * {@link android.content.Context}, an {@link android.app.Activity}, or a
+   * {@link android.app.Fragment}.
+   *
+   * <strong>WARNING:</strong>: Picasso will keep a reference to the tag for
+   * as long as this tag is paused and/or has active requests. Look out for
+   * potential leaks.
+   *
+   * @see Picasso#cancelTag(Object)
+   * @see Picasso#pauseTag(Object)
+   * @see Picasso#resumeTag(Object)
+   */
+  public RequestCreator tag(Object tag) {
+    if (tag == null) {
+      throw new IllegalArgumentException("Tag invalid.");
+    }
+    if (this.tag != null) {
+      throw new IllegalStateException("Tag already set.");
+    }
+    this.tag = tag;
+    return this;
+  }
+
+  /**
    * Attempt to resize the image to fit exactly into the target {@link ImageView}'s bounds. This
    * will result in delayed execution of the request until the {@link ImageView} has been laid out.
    * <p>
@@ -183,7 +205,8 @@ public class RequestCreator {
 
   /**
    * Same as {@link #fit()} but an optional boolean parameter can be passed. This is useful when
-   * the target view (or one of its parent) is hidden (visibility = GONE) because otherwise picasso
+   * the target view (or one of its parent) is hidden (like a child in a ViewAnimator) 
+   * because otherwise picasso
    * fails to get the correct width/height of the view. When this parameter is set to true, the
    * width and the height of the view will be generated using getMeasuredWidth/Height instead of
    * getWidth/Height.
@@ -192,10 +215,10 @@ public class RequestCreator {
    * @return
    */
   public RequestCreator fit(boolean targetIsHidden) {
-	  deferred = true;
-	  this.targetIsHidden = targetIsHidden;
-	  return this;
-  }
+    deferred = true;
+    this.targetIsHidden = targetIsHidden;
+    return this;
+  }  
 
   /** Internal use only. Used by {@link DeferredRequestCreator}. */
   RequestCreator unfit() {
@@ -208,9 +231,16 @@ public class RequestCreator {
     return resizeDimen(targetWidthResId, targetHeightResId, false);
   }
 
-  /** Resize the image to the specified dimension size. */
+  /**
+   * Resizes the image to the specified size in pixels
+   *
+   * @param targetWidthResId  target width
+   * @param targetHeightResId target height
+   * @param onlyIfBigger If true the bitmap will be resized only only if bigger than
+   *                     targetWidth or targetHeight. If false the bitmap will be always resized
+   */
   public RequestCreator resizeDimen(int targetWidthResId, int targetHeightResId,
-      boolean onlyIfBigger) {
+                                    boolean onlyIfBigger) {
     Resources resources = picasso.context.getResources();
     int targetWidth = resources.getDimensionPixelSize(targetWidthResId);
     int targetHeight = resources.getDimensionPixelSize(targetHeightResId);
@@ -237,7 +267,7 @@ public class RequestCreator {
   /**
    * Resized the image based on the bounds specified by {@link #resize(int, int)}
    * and taking only the largest image side into account.
-   * This means that if 'resize(300,200)' is called and the image size is 800x600,
+   * This means that if 'resize(300, 200)' is called and the image size is 800x600,
    * then the image will be resized to 300x225 because the largest side is 800, which
    * will be resized to 300 and the height, which is 600, will be resized according to
    * its original size ratio.
@@ -291,35 +321,9 @@ public class RequestCreator {
   }
 
   /**
-   * Instead of let Picasso create a new instance of BitmapFactory.Options, use
-   * this instance instead.<br />
-   * This can be useful if you want to use a single instance of Options, thus preventing
-   * a log of G'cing, and also if you want to take advantage of some of the features of
-   * the Options class itself (like 'inBitmap').
-   * The tradeoff is that using this feature the decoding process needs to be synchronized.
-   *
-   * @param options
-   * @return
-   */
-  public RequestCreator withOptions(BitmapFactory.Options options) {
-    data.options(options);
-	return this;
-  }
-
-  /**
-   * Assign a custom {@link Generator} which will be used to decode the Uri,
-   * only if the uri scheme is {@link Picasso#SCHEME_CUSTOM}
-   * @param generator
-   * @return
-   */
-  public RequestCreator withGenerator(Generator generator) {
-    data.setGenerator(generator);
-    return this;
-  }
-
-  /**
    * Temporary use a different cache instance
-   * @param cache
+   *
+   * @param cache the custom cache object to be used
    */
   public RequestCreator withCache(Cache cache) {
     data.setCache(cache);
@@ -328,11 +332,24 @@ public class RequestCreator {
 
   /**
    * Specify a diskCache to use
+   *
    * @param cache
    * @return
    */
   public RequestCreator withDiskCache(Cache cache) {
     data.setDiskCache(cache);
+    return this;
+  }
+
+  /**
+   * Set the priority of this request.
+   * <p>
+   * This will affect the order in which the requests execute but does not guarantee it.
+   * By default, all requests have {@link Priority#NORMAL} priority, except for
+   * {@link #fetch()} requests, which have {@link Priority#LOW} priority by default.
+   */
+  public RequestCreator priority(Priority priority) {
+    data.priority(priority);
     return this;
   }
 
@@ -392,7 +409,7 @@ public class RequestCreator {
    */
   public Bitmap get() throws IOException {
     long started = System.nanoTime();
-    checkNotMain();
+    Utils.checkNotMain();
 
     if (deferred) {
       throw new IllegalStateException("Fit cannot be used with get.");
@@ -402,12 +419,10 @@ public class RequestCreator {
     }
 
     Request finalData = createRequest(started);
-    String key = createKey(finalData, new StringBuilder());
+    String key = Utils.createKey(finalData, new StringBuilder());
 
-    Action action = new GetAction(picasso, finalData, skipMemoryCache, fadeTime, key);
-    return forRequest(picasso.context, picasso, picasso.dispatcher,
-        data.getCache(), data.getDiskCache(), picasso.stats, action,
-        picasso.dispatcher.downloader).hunt();
+    Action action = new GetAction(picasso, finalData, skipMemoryCache, key, tag, fadeTime);
+    return forRequest(picasso, picasso.dispatcher, data.getCache(), data.getDiskCache(), picasso.stats, action).hunt();
   }
 
   /**
@@ -423,10 +438,15 @@ public class RequestCreator {
       throw new IllegalStateException("Fit cannot be used with fetch.");
     }
     if (data.hasImage()) {
-      Request request = createRequest(started);
-      String key = createKey(request, new StringBuilder());
+      // Fetch requests have lower priority by default.
+      if (!data.hasPriority()) {
+        data.priority(Priority.LOW);
+      }
 
-      Action action = new FetchAction(picasso, request, skipMemoryCache, fadeTime, key);
+      Request request = createRequest(started);
+      String key = Utils.createKey(request, new StringBuilder());
+
+      Action action = new FetchAction(picasso, request, skipMemoryCache, key, tag, fadeTime);
       picasso.submit(action, delayMillis);
     }
   }
@@ -478,7 +498,7 @@ public class RequestCreator {
    */
   public void into(Target target) {
     long started = System.nanoTime();
-    checkMain();
+    Utils.checkMain();
 
     if (target == null) {
       throw new IllegalArgumentException("Target must not be null.");
@@ -498,7 +518,7 @@ public class RequestCreator {
     }
 
     Request request = createRequest(started);
-    String requestKey = createKey(request);
+    String requestKey = Utils.createKey(request);
 
     if (!skipMemoryCache) {
       Bitmap bitmap = picasso.quickMemoryCacheCheck(data.getCache(), requestKey);
@@ -512,8 +532,8 @@ public class RequestCreator {
     target.onPrepareLoad(drawable);
 
     Action action =
-      new TargetAction(picasso, target, request, skipMemoryCache, fadeTime,
-        errorResId, errorDrawable, requestKey);
+        new TargetAction(picasso, target, request, skipMemoryCache, errorResId, errorDrawable,
+            requestKey, tag, fadeTime);
     picasso.enqueueAndSubmit(action, delayMillis);
   }
 
@@ -524,7 +544,7 @@ public class RequestCreator {
   public void into(RemoteViews remoteViews, int viewId, int notificationId,
       Notification notification) {
     long started = System.nanoTime();
-    checkMain();
+    Utils.checkMain();
 
     if (remoteViews == null) {
       throw new IllegalArgumentException("RemoteViews must not be null.");
@@ -541,11 +561,11 @@ public class RequestCreator {
     }
 
     Request request = createRequest(started);
-    String key = createKey(request);
+    String key = Utils.createKey(request);
 
     RemoteViewsAction action =
-        new NotificationAction(picasso, request, remoteViews, viewId, notificationId,
-            notification, skipMemoryCache, fadeTime, errorResId, key);
+        new NotificationAction(picasso, request, remoteViews, viewId, notificationId, notification,
+            skipMemoryCache, errorResId, key, tag, fadeTime);
 
     performRemoteViewInto(action);
   }
@@ -556,7 +576,7 @@ public class RequestCreator {
    */
   public void into(RemoteViews remoteViews, int viewId, int[] appWidgetIds) {
     long started = System.nanoTime();
-    checkMain();
+    Utils.checkMain();
 
     if (remoteViews == null) {
       throw new IllegalArgumentException("remoteViews must not be null.");
@@ -573,11 +593,11 @@ public class RequestCreator {
     }
 
     Request request = createRequest(started);
-    String key = createKey(request);
+    String key = Utils.createKey(request);
 
     RemoteViewsAction action =
         new AppWidgetAction(picasso, request, remoteViews, viewId, appWidgetIds, skipMemoryCache,
-            fadeTime, errorResId, key);
+            errorResId, key, tag, fadeTime);
 
     performRemoteViewInto(action);
   }
@@ -603,7 +623,7 @@ public class RequestCreator {
    */
   public void into(ImageView target, Callback callback) {
     long started = System.nanoTime();
-    checkMain();
+    Utils.checkMain();
 
     if (target == null) {
       throw new IllegalArgumentException("Target must not be null.");
@@ -620,25 +640,27 @@ public class RequestCreator {
         throw new IllegalStateException("Fit cannot be used with resize.");
       }
 
-	  int width, height;
-	  if (target.getVisibility() == View.GONE || targetIsHidden) {
-		width = target.getMeasuredWidth();
-		height = target.getMeasuredHeight();
-	  } else {
-		width = target.getWidth();
-		height = target.getHeight();
-	  }
+      int width, height;
+      if (target.getVisibility() == View.GONE || targetIsHidden) {
+        // if the view is hidden and it was never rendered
+        // there's a chance that getWidth/getHeight will be always 0
+        width = target.getMeasuredWidth();
+        height = target.getMeasuredHeight();
+      } else {
+        width = target.getWidth();
+        height = target.getHeight();
+      }
 
-      if (width == 0 || height == 0) {
+      if (width <= 0 || height <= 0) {
         setPlaceholder(target, placeholderResId, placeholderDrawable);
         picasso.defer(target, new DeferredRequestCreator(this, target, targetIsHidden, callback));
         return;
       }
-      data.resize(width, height, false);
+      data.resize(width, height);
     }
 
     Request request = createRequest(started);
-    String requestKey = createKey(request);
+    String requestKey = Utils.createKey(request);
 
     if (!skipMemoryCache) {
       Bitmap bitmap = picasso.quickMemoryCacheCheck(data.getCache(), requestKey);
@@ -646,7 +668,7 @@ public class RequestCreator {
         picasso.cancelRequest(target);
         setBitmap(target, picasso.context, bitmap, MEMORY, fadeTime, picasso.indicatorsEnabled);
         if (picasso.loggingEnabled) {
-          log(OWNER_MAIN, VERB_COMPLETED, request.plainId(), "from " + MEMORY);
+          Utils.log(Utils.OWNER_MAIN, Utils.VERB_COMPLETED, request.plainId(), "from " + MEMORY);
         }
         if (callback != null) {
           callback.onSuccess();
@@ -659,7 +681,7 @@ public class RequestCreator {
 
     Action action =
         new ImageViewAction(picasso, target, request, skipMemoryCache, fadeTime, errorResId,
-            errorDrawable, requestKey, callback);
+            errorDrawable, requestKey, tag, callback);
 
     picasso.enqueueAndSubmit(action, delayMillis);
   }
@@ -674,7 +696,7 @@ public class RequestCreator {
 
     boolean loggingEnabled = picasso.loggingEnabled;
     if (loggingEnabled) {
-      log(OWNER_MAIN, VERB_CREATED, request.plainId(), request.toString());
+      Utils.log(Utils.OWNER_MAIN, Utils.VERB_CREATED, request.plainId(), request.toString());
     }
 
     Request transformed = picasso.transformRequest(request);
@@ -684,7 +706,7 @@ public class RequestCreator {
       transformed.started = started;
 
       if (loggingEnabled) {
-        log(OWNER_MAIN, VERB_CHANGED, transformed.logId(), "into " + transformed);
+        Utils.log(Utils.OWNER_MAIN, Utils.VERB_CHANGED, transformed.logId(), "into " + transformed);
       }
     }
 

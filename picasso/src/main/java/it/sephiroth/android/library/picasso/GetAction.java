@@ -18,8 +18,9 @@ package it.sephiroth.android.library.picasso;
 import android.graphics.Bitmap;
 
 class GetAction extends Action<Void> {
-  GetAction(Picasso picasso, Request data, boolean skipCache, long fadeTime, String key) {
-    super(picasso, null, data, skipCache, fadeTime, 0, null, key);
+  GetAction(Picasso picasso, Request data, boolean skipCache, String key, Object tag,
+            long fadeTime) {
+    super(picasso, null, data, skipCache, fadeTime, 0, null, key, tag);
   }
 
   @Override void complete(Bitmap result, Picasso.LoadedFrom from) {

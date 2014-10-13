@@ -24,24 +24,23 @@ import android.os.Looper;
 import android.os.Message;
 import android.os.Process;
 import android.widget.ImageView;
+import android.widget.RemoteViews;
 
 import java.io.File;
 import java.lang.ref.ReferenceQueue;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.concurrent.ExecutorService;
 
 import static android.os.Process.THREAD_PRIORITY_BACKGROUND;
-import static it.sephiroth.android.library.picasso.Action.RequestWeakReference;
 import static it.sephiroth.android.library.picasso.Dispatcher.HUNTER_BATCH_COMPLETE;
+import static it.sephiroth.android.library.picasso.Dispatcher.REQUEST_BATCH_RESUME;
 import static it.sephiroth.android.library.picasso.Dispatcher.REQUEST_COMPLETE;
 import static it.sephiroth.android.library.picasso.Dispatcher.REQUEST_GCED;
-import static it.sephiroth.android.library.picasso.Utils.OWNER_MAIN;
-import static it.sephiroth.android.library.picasso.Utils.THREAD_PREFIX;
-import static it.sephiroth.android.library.picasso.Utils.VERB_COMPLETED;
-import static it.sephiroth.android.library.picasso.Utils.VERB_ERRORED;
-import static it.sephiroth.android.library.picasso.Utils.checkMain;
+import static it.sephiroth.android.library.picasso.Picasso.LoadedFrom.MEMORY;
 import static it.sephiroth.android.library.picasso.Utils.log;
 
 /**
@@ -51,11 +50,6 @@ import static it.sephiroth.android.library.picasso.Utils.log;
  * own instance with {@link Builder}.
  */
 public class Picasso {
-
-  /**
-   * Custom Uri scheme to be used associated with a custom {@link Generator}
-   */
-  public static final String SCHEME_CUSTOM = "custom.resource";
 
   /** Callbacks for Picasso events. */
   public interface Listener {
@@ -92,6 +86,17 @@ public class Picasso {
     };
   }
 
+  /**
+   * The priority of a request.
+   *
+   * @see RequestCreator#priority(Priority)
+   */
+  public enum Priority {
+    LOW,
+    NORMAL,
+    HIGH
+  }
+
   static final String TAG = "Picasso";
   static final Handler HANDLER = new Handler(Looper.getMainLooper()) {
     @Override public void handleMessage(Message msg) {
@@ -110,11 +115,17 @@ public class Picasso {
           action.picasso.cancelExistingRequest(action.getTarget());
           break;
         }
-        case REQUEST_COMPLETE: {
+        case REQUEST_BATCH_RESUME:
+          @SuppressWarnings("unchecked") List<Action> batch = (List<Action>) msg.obj;
+          for (int i = 0, n = batch.size(); i < n; i++) {
+            Action action = batch.get(i);
+            action.picasso.resumeAction(action);
+          }
+          break;
+        case REQUEST_COMPLETE:
           BitmapHunter hunter = (BitmapHunter) msg.obj;
           hunter.picasso.complete(hunter);
           break;
-        }
         default:
           throw new AssertionError("Unknown handler message received: " + msg.what);
       }
@@ -126,6 +137,7 @@ public class Picasso {
   private final Listener listener;
   private final RequestTransformer requestTransformer;
   private final CleanupThread cleanupThread;
+  private final List<RequestHandler> requestHandlers;
 
   final Context context;
   final Dispatcher dispatcher;
@@ -141,13 +153,36 @@ public class Picasso {
   boolean shutdown;
 
   Picasso(Context context, Dispatcher dispatcher, Cache cache, Listener listener,
-      RequestTransformer requestTransformer, Stats stats, boolean indicatorsEnabled,
-      boolean loggingEnabled) {
+      RequestTransformer requestTransformer, List<RequestHandler> extraRequestHandlers,
+      Stats stats, boolean indicatorsEnabled, boolean loggingEnabled) {
     this.context = context;
     this.dispatcher = dispatcher;
     this.cache = cache;
     this.listener = listener;
     this.requestTransformer = requestTransformer;
+
+    int builtInHandlers = 7; // Adjust this as internal handlers are added or removed.
+    int extraCount = (extraRequestHandlers != null ? extraRequestHandlers.size() : 0);
+    List<RequestHandler> allRequestHandlers =
+        new ArrayList<RequestHandler>(builtInHandlers + extraCount);
+
+    // ResourceRequestHandler needs to be the first in the list to avoid
+    // forcing other RequestHandlers to perform null checks on request.uri
+    // to cover the (request.resourceId != 0) case.
+    allRequestHandlers.add(new ResourceRequestHandler(context));
+    if (extraRequestHandlers != null) {
+      allRequestHandlers.addAll(extraRequestHandlers);
+    }
+    allRequestHandlers.add(new ContactsPhotoRequestHandler(context));
+    allRequestHandlers.add(new MediaStoreRequestHandler(context));
+    allRequestHandlers.add(new ContentStreamRequestHandler(context));
+    allRequestHandlers.add(new AssetRequestHandler(context));
+    allRequestHandlers.add(new FileRequestHandler(context));
+    allRequestHandlers.add(new NetworkRequestHandler(dispatcher.downloader, stats));
+    // why shouldn't be able to modify the list?
+    // requestHandlers = Collections.unmodifiableList(allRequestHandlers);
+    requestHandlers = Collections.synchronizedList(allRequestHandlers);
+
     this.stats = stats;
     this.targetToAction = new WeakHashMap<Object, Action>();
     this.targetToDeferredRequestCreator = new WeakHashMap<ImageView, DeferredRequestCreator>();
@@ -166,6 +201,65 @@ public class Picasso {
   /** Cancel any existing requests for the specified {@link Target} instance. */
   public void cancelRequest(Target target) {
     cancelExistingRequest(target);
+  }
+
+  /**
+   * Cancel any existing requests for the specified {@link RemoteViews} target with the given {@code
+   * viewId}.
+   */
+  public void cancelRequest(RemoteViews remoteViews, int viewId) {
+    cancelExistingRequest(new RemoteViewsAction.RemoteViewsTarget(remoteViews, viewId));
+  }
+
+  /**
+   * Cancel any existing requests with given tag. You can set a tag
+   * on new requests with {@link RequestCreator#tag(Object)}.
+   *
+   * @see RequestCreator#tag(Object)
+   */
+  public void cancelTag(Object tag) {
+    Utils.checkMain();
+    List<Action> actions = new ArrayList<Action>(targetToAction.values());
+    for (int i = 0, n = actions.size(); i < n; i++) {
+      Action action = actions.get(i);
+      if (action.getTag().equals(tag)) {
+        cancelExistingRequest(action.getTarget());
+      }
+    }
+  }
+
+  /**
+   * Pause existing requests with the given tag. Use {@link #resumeTag(Object)}
+   * to resume requests with the given tag.
+   *
+   * @see #resumeTag(Object)
+   * @see RequestCreator#tag(Object)
+   */
+  public void pauseTag(Object tag) {
+    dispatcher.dispatchPauseTag(tag);
+  }
+
+  /**
+   * Resume paused requests with the given tag. Use {@link #pauseTag(Object)}
+   * to pause requests with the given tag.
+   *
+   * @see #pauseTag(Object)
+   * @see RequestCreator#tag(Object)
+   */
+  public void resumeTag(Object tag) {
+    dispatcher.dispatchResumeTag(tag);
+  }
+
+  /**
+   * Resume paused requests with the given with a delay. Use {@link #pauseTag(Object)}
+   * to pause requests with the given tag.
+   *
+   * @see #pauseTag(Object)
+   * @see #resumeTag(Object)
+   * @see RequestCreator#tag(Object)
+   */
+  public void resumeTag(Object tag, long millis) {
+    dispatcher.dispatchResumeTag(tag, millis);
   }
 
   /**
@@ -323,6 +417,27 @@ public class Picasso {
     shutdown = true;
   }
 
+  List<RequestHandler> getRequestHandlers() {
+    return requestHandlers;
+  }
+
+  /**
+   * Add a new custom request to the list of registered
+   * handlers. It will throw an exception if the handler is already registered
+   * @param handler
+   * @throws java.lang.IllegalStateException
+   */
+  public void addRequestHandler(RequestHandler handler) {
+    if (requestHandlers.contains(handler)) {
+      throw new IllegalStateException("RequestHandler already registered.");
+    }
+    requestHandlers.add(1, handler);
+  }
+
+  public boolean removeRequestHandler(RequestHandler handler) {
+    return requestHandlers.remove(handler);
+  }
+
   Request transformRequest(Request request) {
     Request transformed = requestTransformer.transformRequest(request);
     if (transformed == null) {
@@ -340,7 +455,7 @@ public class Picasso {
 
   void enqueueAndSubmit(Action action, long delayMillis) {
     Object target = action.getTarget();
-    if (target != null) {
+    if (target != null && targetToAction.get(target) != action) {
       // This will also check we are on the main thread.
       cancelExistingRequest(target);
       targetToAction.put(target, action);
@@ -395,6 +510,27 @@ public class Picasso {
     }
   }
 
+  void resumeAction(Action action) {
+    Bitmap bitmap = null;
+    if (!action.skipCache) {
+      bitmap = quickMemoryCacheCheck(action.request.cache, action.getKey());
+    }
+
+    if (bitmap != null) {
+      // Resumed action is cached, complete immediately.
+      deliverAction(bitmap, MEMORY, action);
+      if (loggingEnabled) {
+        Utils.log(Utils.OWNER_MAIN, Utils.VERB_COMPLETED, action.request.logId(), "from " + MEMORY);
+      }
+    } else {
+      // Re-submit the action to the executor.
+      enqueueAndSubmit(action, 0);
+      if (loggingEnabled) {
+        Utils.log(Utils.OWNER_MAIN, Utils.VERB_RESUMED, action.request.logId());
+      }
+    }
+  }
+
   private void deliverAction(Bitmap result, LoadedFrom from, Action action) {
     if (action.isCancelled()) {
       return;
@@ -408,18 +544,18 @@ public class Picasso {
       }
       action.complete(result, from);
       if (loggingEnabled) {
-        log(OWNER_MAIN, VERB_COMPLETED, action.request.logId(), "from " + from);
+        Utils.log(Utils.OWNER_MAIN, Utils.VERB_COMPLETED, action.request.logId(), "from " + from);
       }
     } else {
       action.error();
       if (loggingEnabled) {
-        log(OWNER_MAIN, VERB_ERRORED, action.request.logId());
+        Utils.log(Utils.OWNER_MAIN, Utils.VERB_ERRORED, action.request.logId());
       }
     }
   }
 
   private void cancelExistingRequest(Object target) {
-    checkMain();
+    Utils.checkMain();
     Action action = targetToAction.remove(target);
     if (action != null) {
       action.cancel();
@@ -452,7 +588,7 @@ public class Picasso {
       this.referenceQueue = referenceQueue;
       this.handler = handler;
       setDaemon(true);
-      setName(THREAD_PREFIX + "refQueue");
+      setName(Utils.THREAD_PREFIX + "refQueue");
     }
 
     @Override public void run() {
@@ -515,6 +651,7 @@ public class Picasso {
     private Cache cache;
     private Listener listener;
     private RequestTransformer transformer;
+    private List<RequestHandler> requestHandlers;
 
     private boolean indicatorsEnabled;
     private boolean loggingEnabled;
@@ -592,6 +729,21 @@ public class Picasso {
       return this;
     }
 
+    /** Register a {@link RequestHandler}. */
+    public Builder addRequestHandler(RequestHandler requestHandler) {
+      if (requestHandler == null) {
+        throw new IllegalArgumentException("RequestHandler must not be null.");
+      }
+      if (requestHandlers == null) {
+        requestHandlers = new ArrayList<RequestHandler>();
+      }
+      if (requestHandlers.contains(requestHandler)) {
+        throw new IllegalStateException("RequestHandler already registered.");
+      }
+      requestHandlers.add(requestHandler);
+      return this;
+    }
+
     /**
      * @deprecated Use {@link #indicatorsEnabled(boolean)} instead.
      * Whether debugging is enabled or not.
@@ -638,8 +790,8 @@ public class Picasso {
 
       Dispatcher dispatcher = new Dispatcher(context, service, HANDLER, downloader, cache, stats);
 
-      return new Picasso(context, dispatcher, cache, listener, transformer, stats,
-          indicatorsEnabled, loggingEnabled);
+      return new Picasso(context, dispatcher, cache, listener, transformer,
+          requestHandlers, stats, indicatorsEnabled, loggingEnabled);
     }
   }
 
@@ -647,8 +799,8 @@ public class Picasso {
   public enum LoadedFrom {
     MEMORY(Color.GREEN),
     DISK(Color.YELLOW),
-    DISK_CACHE(Color.BLUE),
-    NETWORK(Color.RED);
+    NETWORK(Color.RED),
+    DISK_CACHE(Color.BLUE);
 
     final int debugColor;
 

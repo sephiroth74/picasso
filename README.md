@@ -14,14 +14,14 @@ Download
 
 Download [the latest JAR][2] or grab via Gradle:
 ```groovy
-compile 'com.squareup.picasso:picasso:2.3.3'
+compile 'com.squareup.picasso:picasso:2.3.4'
 ```
 or Maven:
 ```xml
 <dependency>
-    <groupId>it.sephiroth.android.library.picasso</groupId>
+    <groupId>com.squareup.picasso</groupId>
     <artifactId>picasso</artifactId>
-    <version>2.3.3</version>
+    <version>2.3.4</version>
 </dependency>
 ```
 
@@ -55,5 +55,5 @@ License
     limitations under the License.
 
 
- [1]: http://sephiroth74.github.io/picasso/
- [2]: https://repository.sonatype.org/#nexus-search;quick~it.sephiroth.android.library.picasso
+ [1]: http://square.github.io/picasso/
+ [2]: http://repository.sonatype.org/service/local/artifact/maven/redirect?r=central-proxy&g=com.squareup.picasso&a=picasso&v=LATEST

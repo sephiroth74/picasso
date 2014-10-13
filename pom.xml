@@ -9,9 +9,9 @@
     <version>7</version>
   </parent>
 
-  <groupId>it.sephiroth.android.library.picasso</groupId>
+  <groupId>com.squareup.picasso</groupId>
   <artifactId>picasso-parent</artifactId>
-  <version>2.3.4-SNAPSHOT</version>
+  <version>2.3.5-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>Picasso (Parent)</name>
@@ -127,7 +127,7 @@
           <version>3.8.1</version>
           <configuration>
             <sdk>
-              <platform>17</platform>
+              <platform>19</platform>
             </sdk>
           </configuration>
         </plugin>

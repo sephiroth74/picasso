@@ -32,11 +32,12 @@ class DeferredRequestCreator implements ViewTreeObserver.OnPreDrawListener {
     this(creator, target, false, null);
   }
 
-  DeferredRequestCreator(RequestCreator creator, ImageView target, final boolean targetIsHidden, Callback callback) {
+  DeferredRequestCreator(RequestCreator creator, ImageView target, boolean targetIsHidden, 
+      Callback callback) {
     this.creator = creator;
     this.target = new WeakReference<ImageView>(target);
-    this.targetIsHidden = targetIsHidden;
     this.callback = callback;
+    this.targetIsHidden = targetIsHidden;
     target.getViewTreeObserver().addOnPreDrawListener(this);
   }
 
@@ -50,15 +51,15 @@ class DeferredRequestCreator implements ViewTreeObserver.OnPreDrawListener {
       return true;
     }
 
-	int width, height;
+    int width, height;
 
-	if (target.getVisibility() == View.GONE || targetIsHidden) {
-	  width = target.getMeasuredWidth();
-	  height = target.getMeasuredHeight();
-	} else {
-	  width = target.getWidth();
-	  height = target.getHeight();
-	}
+    if (target.getVisibility() == View.GONE || targetIsHidden) {
+      width = target.getMeasuredWidth();
+      height = target.getMeasuredHeight();
+    } else {
+      width = target.getWidth();
+      height = target.getHeight();
+    }
 
     if (width <= 0 || height <= 0) {
       return true;

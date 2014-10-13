@@ -22,16 +22,15 @@ import android.graphics.Bitmap;
 import android.widget.RemoteViews;
 
 import static android.content.Context.NOTIFICATION_SERVICE;
-import static it.sephiroth.android.library.picasso.Utils.getService;
 
 abstract class RemoteViewsAction extends Action<RemoteViewsAction.RemoteViewsTarget> {
   final RemoteViews remoteViews;
   final int viewId;
 
   RemoteViewsAction(Picasso picasso, Request data, RemoteViews remoteViews, int viewId,
-      int errorResId, boolean skipCache, long fadeTime, String key) {
-    super(picasso, new RemoteViewsTarget(remoteViews, viewId), data, skipCache, fadeTime, errorResId,
-        null, key);
+      int errorResId, boolean skipCache, String key, Object tag, long fadeTime) {
+    super(picasso, new RemoteViewsTarget(remoteViews, viewId), data, skipCache, fadeTime,
+            errorResId, null, key, tag);
     this.remoteViews = remoteViews;
     this.viewId = viewId;
   }
@@ -80,8 +79,9 @@ abstract class RemoteViewsAction extends Action<RemoteViewsAction.RemoteViewsTar
     private final int[] appWidgetIds;
 
     AppWidgetAction(Picasso picasso, Request data, RemoteViews remoteViews, int viewId,
-        int[] appWidgetIds, boolean skipCache, long fadeTime, int errorResId, String key) {
-      super(picasso, data, remoteViews, viewId, errorResId, skipCache, fadeTime, key);
+        int[] appWidgetIds, boolean skipCache, int errorResId, String key, Object tag,
+        long fadeTime) {
+      super(picasso, data, remoteViews, viewId, errorResId, skipCache, key, tag, fadeTime);
       this.appWidgetIds = appWidgetIds;
     }
 
@@ -96,15 +96,15 @@ abstract class RemoteViewsAction extends Action<RemoteViewsAction.RemoteViewsTar
     private final Notification notification;
 
     NotificationAction(Picasso picasso, Request data, RemoteViews remoteViews, int viewId,
-        int notificationId, Notification notification, boolean skipCache, long fadeTime,
-        int errorResId, String key) {
-      super(picasso, data, remoteViews, viewId, errorResId, skipCache, fadeTime, key);
+        int notificationId, Notification notification, boolean skipCache, int errorResId,
+        String key, Object tag, long fadeTime) {
+      super(picasso, data, remoteViews, viewId, errorResId, skipCache, key, tag, fadeTime);
       this.notificationId = notificationId;
       this.notification = notification;
     }
 
     @Override void update() {
-      NotificationManager manager = getService(picasso.context, NOTIFICATION_SERVICE);
+      NotificationManager manager = Utils.getService(picasso.context, NOTIFICATION_SERVICE);
       manager.notify(notificationId, notification);
     }
   }

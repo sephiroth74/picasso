@@ -1,3 +1,2 @@
-
 include ':picasso'
 include ':picasso-sample'
