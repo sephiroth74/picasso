@@ -1,0 +1,51 @@
+apply plugin: 'com.android.library'
+
+
+group GROUP
+version VERSION_NAME
+
+
+dependencies {
+    compile 'com.squareup.okhttp:okhttp:2.1.0'
+    compile 'com.squareup.okhttp:okhttp-urlconnection:2.1.0'
+    compile 'com.intellij:annotations:12.+'
+}
+
+
+android {
+    compileSdkVersion Integer.parseInt(ANDROID_BUILD_SDK_VERSION)
+    buildToolsVersion ANDROID_BUILD_TOOLS_VERSION
+
+
+    defaultConfig {
+        minSdkVersion 9
+        targetSdkVersion Integer.parseInt(ANDROID_BUILD_TARGET_SDK_VERSION)
+        versionCode 1
+        versionName version
+    }
+
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+        }
+    }
+}
+
+
+android.libraryVariants.all { variant ->
+    task("generate${variant.name.capitalize()}Javadoc", type: Javadoc) {
+        description "Generates Javadoc for $variant.name."
+        source = variant.javaCompile.source
+        ext.androidJar = "${android.sdkDirectory}/platforms/${android.compileSdkVersion}/android.jar"
+        classpath = files(variant.javaCompile.classpath.files) + files(ext.androidJar)
+        options.links("http://docs.oracle.com/javase/7/docs/api/");
+        options.links("http://d.android.com/reference/");
+        exclude '**/BuildConfig.java'
+        exclude '**/R.java'
+    }
+}
+
+
+apply from: 'https://raw.githubusercontent.com/sephiroth74/gradle-mvn-push/master/gradle-mvn-push.gradle'

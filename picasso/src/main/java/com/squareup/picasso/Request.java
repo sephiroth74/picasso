@@ -70,6 +70,7 @@ public final class Request {
    * This is mutually exclusive with {@link #centerCrop}.
    */
   public final boolean centerInside;
+  public final boolean resizeByMaxSide;
   public final boolean onlyScaleDown;
   /** Amount to rotate the image in degrees. */
   public final float rotationDegrees;
@@ -83,11 +84,15 @@ public final class Request {
   public final Bitmap.Config config;
   /** The priority of this request. */
   public final Priority priority;
+  /** cache to be used */
+  public final Cache cache;
+  /** optional disk cache */
+  public final Cache diskCache;
 
   private Request(Uri uri, int resourceId, String stableKey, List<Transformation> transformations,
       int targetWidth, int targetHeight, boolean centerCrop, boolean centerInside,
-      boolean onlyScaleDown, float rotationDegrees, float rotationPivotX, float rotationPivotY,
-      boolean hasRotationPivot, Bitmap.Config config, Priority priority) {
+      boolean onlyScaleDown, boolean resizeByMaxSide, float rotationDegrees, float rotationPivotX, float rotationPivotY,
+      boolean hasRotationPivot, Bitmap.Config config, Priority priority, Cache cache, Cache diskCache) {
     this.uri = uri;
     this.resourceId = resourceId;
     this.stableKey = stableKey;
@@ -105,8 +110,11 @@ public final class Request {
     this.rotationPivotX = rotationPivotX;
     this.rotationPivotY = rotationPivotY;
     this.hasRotationPivot = hasRotationPivot;
+    this.resizeByMaxSide = resizeByMaxSide;
     this.config = config;
     this.priority = priority;
+    this.cache = cache;
+    this.diskCache = diskCache;
   }
 
   @Override public String toString() {
@@ -197,6 +205,7 @@ public final class Request {
     private boolean centerCrop;
     private boolean centerInside;
     private boolean onlyScaleDown;
+    private boolean resizeByMaxSide;    
     private float rotationDegrees;
     private float rotationPivotX;
     private float rotationPivotY;
@@ -204,6 +213,8 @@ public final class Request {
     private List<Transformation> transformations;
     private Bitmap.Config config;
     private Priority priority;
+    private Cache cache;
+    private Cache diskCache;
 
     /** Start building a request using the specified {@link Uri}. */
     public Builder(Uri uri) {
@@ -239,6 +250,8 @@ public final class Request {
       }
       config = request.config;
       priority = request.priority;
+      cache = request.cache;
+      diskCache = request.diskCache;
     }
 
     boolean hasImage() {
@@ -309,12 +322,23 @@ public final class Request {
       return this;
     }
 
+    /** Resizes the image by its max side */
+    public Builder resizeByMaxSide() {
+      if (centerInside || centerCrop) {
+        throw new IllegalStateException("Resize by max side cannot be used with centerCrop or " +
+            "centerInside");
+      }
+      this.resizeByMaxSide = true;
+      return this;
+    }
+
     /** Clear the resize transformation, if any. This will also clear center crop/inside if set. */
     public Builder clearResize() {
       targetWidth = 0;
       targetHeight = 0;
       centerCrop = false;
       centerInside = false;
+      resizeByMaxSide = false;
       return this;
     }
 
@@ -324,7 +348,7 @@ public final class Request {
      * requested bounds and then crops the extra.
      */
     public Builder centerCrop() {
-      if (centerInside) {
+      if (centerInside || resizeByMaxSide) {
         throw new IllegalStateException("Center crop can not be used after calling centerInside");
       }
       centerCrop = true;
@@ -342,7 +366,7 @@ public final class Request {
      * the image so that both dimensions are equal to or less than the requested bounds.
      */
     public Builder centerInside() {
-      if (centerCrop) {
+      if (centerCrop || resizeByMaxSide) {
         throw new IllegalStateException("Center inside can not be used after calling centerCrop");
       }
       centerInside = true;
@@ -403,6 +427,24 @@ public final class Request {
       return this;
     }
 
+    public Builder setCache(Cache cache) {
+      this.cache = cache;
+      return this;
+    }
+
+    public Cache getCache() {
+      return this.cache;
+    }
+
+    public Builder setDiskCache(Cache cache) {
+      this.diskCache = cache;
+      return this;
+    }
+
+    public Cache getDiskCache() {
+      return this.diskCache;
+    }
+
     /** Execute request using the specified priority. */
     public Builder priority(Priority priority) {
       if (priority == null) {
@@ -451,6 +493,12 @@ public final class Request {
 
     /** Create the immutable {@link Request} object. */
     public Request build() {
+      if (centerInside && resizeByMaxSide) {
+        throw new IllegalStateException("Center Inside and resize by max side can not be used together.");
+      }
+      if (centerCrop && resizeByMaxSide) {
+        throw new IllegalStateException("Center crop and resize by max side can not be used together.");
+      }      
       if (centerInside && centerCrop) {
         throw new IllegalStateException("Center crop and center inside can not be used together.");
       }
@@ -466,8 +514,8 @@ public final class Request {
         priority = Priority.NORMAL;
       }
       return new Request(uri, resourceId, stableKey, transformations, targetWidth, targetHeight,
-          centerCrop, centerInside, onlyScaleDown, rotationDegrees, rotationPivotX, rotationPivotY,
-          hasRotationPivot, config, priority);
+          centerCrop, centerInside, onlyScaleDown, resizeByMaxSide, rotationDegrees, rotationPivotX, rotationPivotY,
+          hasRotationPivot, config, priority, cache, diskCache);
     }
   }
 }

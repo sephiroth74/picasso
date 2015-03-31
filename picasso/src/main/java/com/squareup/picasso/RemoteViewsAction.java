@@ -32,7 +32,7 @@ abstract class RemoteViewsAction extends Action<RemoteViewsAction.RemoteViewsTar
 
   RemoteViewsAction(Picasso picasso, Request data, RemoteViews remoteViews, int viewId,
       int errorResId, int memoryPolicy, int networkPolicy, Object tag, String key) {
-    super(picasso, null, data, memoryPolicy, networkPolicy, errorResId, null, key, tag, false);
+    super(picasso, null, data, memoryPolicy, networkPolicy, errorResId, null, key, tag, 0);
     this.remoteViews = remoteViews;
     this.viewId = viewId;
   }

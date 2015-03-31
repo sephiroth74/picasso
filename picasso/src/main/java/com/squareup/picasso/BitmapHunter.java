@@ -71,6 +71,7 @@ class BitmapHunter implements Runnable {
   final Picasso picasso;
   final Dispatcher dispatcher;
   final Cache cache;
+  final Cache diskCache;
   final Stats stats;
   final String key;
   final Request data;
@@ -88,12 +89,13 @@ class BitmapHunter implements Runnable {
   int retryCount;
   Priority priority;
 
-  BitmapHunter(Picasso picasso, Dispatcher dispatcher, Cache cache, Stats stats, Action action,
+  BitmapHunter(Picasso picasso, Dispatcher dispatcher, Cache cache, Cache diskCache, Stats stats, Action action,
       RequestHandler requestHandler) {
     this.sequence = SEQUENCE_GENERATOR.incrementAndGet();
     this.picasso = picasso;
     this.dispatcher = dispatcher;
     this.cache = cache;
+    this.diskCache = diskCache;
     this.stats = stats;
     this.action = action;
     this.key = action.getKey();
@@ -182,6 +184,7 @@ class BitmapHunter implements Runnable {
     } catch (Exception e) {
       exception = e;
       dispatcher.dispatchFailed(this);
+      e.printStackTrace();
     } finally {
       Thread.currentThread().setName(Utils.THREAD_IDLE_NAME);
     }
@@ -189,6 +192,10 @@ class BitmapHunter implements Runnable {
 
   Bitmap hunt() throws IOException {
     Bitmap bitmap = null;
+
+    if (isCancelled()) {
+      return null;
+    }    
 
     if (shouldReadFromMemoryCache(memoryPolicy)) {
       bitmap = cache.get(key);
@@ -201,6 +208,19 @@ class BitmapHunter implements Runnable {
         return bitmap;
       }
     }
+
+    if (diskCache != null) {
+      bitmap = diskCache.get(key);
+      if (null != bitmap) {
+        stats.dispatchCacheHit();
+        loadedFrom = Picasso.LoadedFrom.DISK_CACHE;
+        return bitmap;
+      }
+    }
+
+    if (isCancelled()) {
+      return null;
+    }    
 
     data.networkPolicy = retryCount == 0 ? NetworkPolicy.OFFLINE.index : networkPolicy;
     RequestHandler.Result result = requestHandler.load(data, networkPolicy);
@@ -220,6 +240,10 @@ class BitmapHunter implements Runnable {
         }
       }
     }
+
+    if (isCancelled()) {
+      return null;
+    }    
 
     if (bitmap != null) {
       if (picasso.loggingEnabled) {
@@ -404,8 +428,8 @@ class BitmapHunter implements Runnable {
     Thread.currentThread().setName(builder.toString());
   }
 
-  static BitmapHunter forRequest(Picasso picasso, Dispatcher dispatcher, Cache cache, Stats stats,
-      Action action) {
+  static BitmapHunter forRequest(Picasso picasso, Dispatcher dispatcher, Cache cache, Cache diskCache, 
+    Stats stats, Action action) {
     Request request = action.getRequest();
     List<RequestHandler> requestHandlers = picasso.getRequestHandlers();
 
@@ -414,11 +438,11 @@ class BitmapHunter implements Runnable {
     for (int i = 0, count = requestHandlers.size(); i < count; i++) {
       RequestHandler requestHandler = requestHandlers.get(i);
       if (requestHandler.canHandleRequest(request)) {
-        return new BitmapHunter(picasso, dispatcher, cache, stats, action, requestHandler);
+        return new BitmapHunter(picasso, dispatcher, cache, diskCache, stats, action, requestHandler);
       }
     }
 
-    return new BitmapHunter(picasso, dispatcher, cache, stats, action, ERRORING_HANDLER);
+    return new BitmapHunter(picasso, dispatcher, cache, diskCache, stats, action, ERRORING_HANDLER);
   }
 
   static Bitmap applyCustomTransformations(List<Transformation> transformations, Bitmap result) {
@@ -467,16 +491,16 @@ class BitmapHunter implements Runnable {
       }
 
       // If the transformation returned a new bitmap ensure they recycled the original.
-      if (newResult != result && !result.isRecycled()) {
-        Picasso.HANDLER.post(new Runnable() {
-          @Override public void run() {
-            throw new IllegalStateException("Transformation "
-                + transformation.key()
-                + " mutated input Bitmap but failed to recycle the original.");
-          }
-        });
-        return null;
-      }
+//      if (newResult != result && !result.isRecycled()) {
+//        Picasso.HANDLER.post(new Runnable() {
+//          @Override public void run() {
+//            throw new IllegalStateException("Transformation "
+//                + transformation.key()
+//                + " mutated input Bitmap but failed to recycle the original.");
+//          }
+//        });
+//        return null;
+//      }
 
       result = newResult;
     }
@@ -535,6 +559,18 @@ class BitmapHunter implements Runnable {
         if (shouldResize(onlyScaleDown, inWidth, inHeight, targetWidth, targetHeight)) {
           matrix.preScale(scale, scale);
         }
+      } else if (data.resizeByMaxSide && (targetWidth != inWidth || targetHeight != inHeight)) {
+        float sx;
+
+        if(inWidth > inHeight){
+          sx = targetWidth / (float) inWidth;
+        } else {
+          sx = targetHeight / (float) inHeight;
+        }
+
+        if (!onlyScaleDown || (onlyScaleDown && (sx < 1.0))) {
+          matrix.preScale(sx, sx);
+        }        
       } else if ((targetWidth != 0 || targetHeight != 0) //
           && (targetWidth != inWidth || targetHeight != inHeight)) {
         // If an explicit target size has been specified and they do not match the results bounds,

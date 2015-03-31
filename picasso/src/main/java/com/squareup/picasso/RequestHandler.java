@@ -155,6 +155,13 @@ public abstract class RequestHandler {
   static void calculateInSampleSize(int reqWidth, int reqHeight, int width, int height,
       BitmapFactory.Options options, Request request) {
     int sampleSize = 1;
+    if (request.resizeByMaxSide) {
+      if (width >= height) {
+        reqHeight = reqWidth;
+      } else {
+        reqWidth = reqHeight;
+      }
+    }    
     if (height > reqHeight || width > reqWidth) {
       final int heightRatio;
       final int widthRatio;

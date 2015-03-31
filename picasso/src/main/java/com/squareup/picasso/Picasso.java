@@ -38,6 +38,7 @@ import static android.os.Process.THREAD_PRIORITY_BACKGROUND;
 import static com.squareup.picasso.Action.RequestWeakReference;
 import static com.squareup.picasso.Dispatcher.HUNTER_BATCH_COMPLETE;
 import static com.squareup.picasso.Dispatcher.REQUEST_BATCH_RESUME;
+import static com.squareup.picasso.Dispatcher.REQUEST_COMPLETE;
 import static com.squareup.picasso.Dispatcher.REQUEST_GCED;
 import static com.squareup.picasso.MemoryPolicy.shouldReadFromMemoryCache;
 import static com.squareup.picasso.Picasso.LoadedFrom.MEMORY;
@@ -134,6 +135,10 @@ public class Picasso {
             action.picasso.resumeAction(action);
           }
           break;
+        case REQUEST_COMPLETE:
+          BitmapHunter hunter = (BitmapHunter) msg.obj;
+          hunter.picasso.complete(hunter);
+          break;
         default:
           throw new AssertionError("Unknown handler message received: " + msg.what);
       }
@@ -189,7 +194,8 @@ public class Picasso {
     allRequestHandlers.add(new AssetRequestHandler(context));
     allRequestHandlers.add(new FileRequestHandler(context));
     allRequestHandlers.add(new NetworkRequestHandler(dispatcher.downloader, stats));
-    requestHandlers = Collections.unmodifiableList(allRequestHandlers);
+    // requestHandlers = Collections.unmodifiableList(allRequestHandlers);
+    requestHandlers = Collections.synchronizedList(allRequestHandlers);
 
     this.stats = stats;
     this.targetToAction = new WeakHashMap<Object, Action>();
@@ -257,6 +263,18 @@ public class Picasso {
    */
   public void resumeTag(Object tag) {
     dispatcher.dispatchResumeTag(tag);
+  }
+
+  /**
+   * Resume paused requests with the given with a delay. Use {@link #pauseTag(Object)}
+   * to pause requests with the given tag.
+   *
+   * @see #pauseTag(Object)
+   * @see #resumeTag(Object)
+   * @see RequestCreator#tag(Object)
+   */
+  public void resumeTag(Object tag, long millis) {
+    dispatcher.dispatchResumeTag(tag, millis);
   }
 
   /**
@@ -428,6 +446,14 @@ public class Picasso {
     return stats.createSnapshot();
   }
 
+  public void clearCache() {
+    cache.clear();
+  }
+
+  public Cache getCache() {
+    return cache;
+  }
+
   /** Stops this instance from accepting further requests. */
   public void shutdown() {
     if (this == singleton) {
@@ -451,6 +477,23 @@ public class Picasso {
     return requestHandlers;
   }
 
+  /**
+   * Add a new custom request to the list of registered
+   * handlers. It will throw an exception if the handler is already registered
+   * @param handler
+   * @throws java.lang.IllegalStateException
+   */
+  public void addRequestHandler(RequestHandler handler) {
+    if (requestHandlers.contains(handler)) {
+      throw new IllegalStateException("RequestHandler already registered.");
+    }
+    requestHandlers.add(1, handler);
+  }
+
+  public boolean removeRequestHandler(RequestHandler handler) {
+    return requestHandlers.remove(handler);
+  }
+
   Request transformRequest(Request request) {
     Request transformed = requestTransformer.transformRequest(request);
     if (transformed == null) {
@@ -466,21 +509,21 @@ public class Picasso {
     targetToDeferredRequestCreator.put(view, request);
   }
 
-  void enqueueAndSubmit(Action action) {
+  void enqueueAndSubmit(Action action, long delayMillis) {
     Object target = action.getTarget();
     if (target != null && targetToAction.get(target) != action) {
       // This will also check we are on the main thread.
       cancelExistingRequest(target);
       targetToAction.put(target, action);
     }
-    submit(action);
+    submit(action, delayMillis);
   }
 
-  void submit(Action action) {
-    dispatcher.dispatchSubmit(action);
+  void submit(Action action, long delayMillis) {
+    dispatcher.dispatchSubmit(action, delayMillis);
   }
 
-  Bitmap quickMemoryCacheCheck(String key) {
+  Bitmap quickMemoryCacheCheck(Cache cache, String key) {
     Bitmap cached = cache.get(key);
     if (cached != null) {
       stats.dispatchCacheHit();
@@ -526,7 +569,7 @@ public class Picasso {
   void resumeAction(Action action) {
     Bitmap bitmap = null;
     if (shouldReadFromMemoryCache(action.memoryPolicy)) {
-      bitmap = quickMemoryCacheCheck(action.getKey());
+      bitmap = quickMemoryCacheCheck(action.request.cache, action.getKey());
     }
 
     if (bitmap != null) {
@@ -537,7 +580,7 @@ public class Picasso {
       }
     } else {
       // Re-submit the action to the executor.
-      enqueueAndSubmit(action);
+      enqueueAndSubmit(action, 0);
       if (loggingEnabled) {
         log(OWNER_MAIN, VERB_RESUMED, action.request.logId());
       }
@@ -854,7 +897,8 @@ public class Picasso {
   public enum LoadedFrom {
     MEMORY(Color.GREEN),
     DISK(Color.BLUE),
-    NETWORK(Color.RED);
+    NETWORK(Color.RED),
+    DISK_CACHE(Color.BLUE);
 
     final int debugColor;
 

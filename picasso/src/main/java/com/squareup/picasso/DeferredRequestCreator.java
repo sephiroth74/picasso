@@ -15,6 +15,7 @@
  */
 package com.squareup.picasso;
 
+import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.ImageView;
 import java.lang.ref.WeakReference;
@@ -24,16 +25,18 @@ class DeferredRequestCreator implements ViewTreeObserver.OnPreDrawListener {
 
   final RequestCreator creator;
   final WeakReference<ImageView> target;
+  final boolean targetIsHidden;
   Callback callback;
 
   @TestOnly DeferredRequestCreator(RequestCreator creator, ImageView target) {
-    this(creator, target, null);
+    this(creator, target, null, false);
   }
 
-  DeferredRequestCreator(RequestCreator creator, ImageView target, Callback callback) {
+  DeferredRequestCreator(RequestCreator creator, ImageView target, Callback callback, boolean targetIsHidden) {
     this.creator = creator;
     this.target = new WeakReference<ImageView>(target);
     this.callback = callback;
+    this.targetIsHidden = targetIsHidden;
     target.getViewTreeObserver().addOnPreDrawListener(this);
   }
 
@@ -47,8 +50,15 @@ class DeferredRequestCreator implements ViewTreeObserver.OnPreDrawListener {
       return true;
     }
 
-    int width = target.getWidth();
-    int height = target.getHeight();
+    int width, height;
+
+    if (target.getVisibility() == View.GONE || targetIsHidden) {
+      width = target.getMeasuredWidth();
+      height = target.getMeasuredHeight();
+    } else {
+      width = target.getWidth();
+      height = target.getHeight();
+    }
 
     if (width <= 0 || height <= 0) {
       return true;

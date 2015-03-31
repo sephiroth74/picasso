@@ -19,8 +19,8 @@ import android.graphics.Bitmap;
 
 class GetAction extends Action<Void> {
   GetAction(Picasso picasso, Request data, int memoryPolicy, int networkPolicy, Object tag,
-      String key) {
-    super(picasso, null, data, memoryPolicy, networkPolicy, 0, null, key, tag, false);
+      String key, long fadeTime) {
+    super(picasso, null, data, memoryPolicy, networkPolicy, 0, null, key, tag, fadeTime);
   }
 
   @Override void complete(Bitmap result, Picasso.LoadedFrom from) {

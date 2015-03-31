@@ -59,7 +59,8 @@ class MediaStoreRequestHandler extends ContentStreamRequestHandler {
     boolean isVideo = mimeType != null && mimeType.startsWith("video/");
 
     if (request.hasSize()) {
-      PicassoKind picassoKind = getPicassoKind(request.targetWidth, request.targetHeight);
+      PicassoKind picassoKind = getPicassoKind(request.targetWidth, 
+        request.resizeByMaxSide ? request.targetWidth : request.targetHeight);
       if (!isVideo && picassoKind == FULL) {
         return new Result(null, getInputStream(request), DISK, exifOrientation);
       }

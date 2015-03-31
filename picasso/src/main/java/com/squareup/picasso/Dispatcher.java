@@ -68,12 +68,13 @@ class Dispatcher {
   static final int HUNTER_RETRY = 5;
   static final int HUNTER_DECODE_FAILED = 6;
   static final int HUNTER_DELAY_NEXT_BATCH = 7;
-  static final int HUNTER_BATCH_COMPLETE = 8;
+  static final int HUNTER_BATCH_COMPLETE = 8; // using batch
   static final int NETWORK_STATE_CHANGE = 9;
   static final int AIRPLANE_MODE_CHANGE = 10;
   static final int TAG_PAUSE = 11;
   static final int TAG_RESUME = 12;
   static final int REQUEST_BATCH_RESUME = 13;
+  static final int REQUEST_COMPLETE = 14;	// single, not using batch
 
   private static final String DISPATCHER_THREAD_NAME = "Dispatcher";
   private static final int BATCH_DELAY = 200; // ms
@@ -95,6 +96,7 @@ class Dispatcher {
   final boolean scansNetworkChanges;
 
   boolean airplaneMode;
+  boolean useBatch;
 
   Dispatcher(Context context, ExecutorService service, Handler mainThreadHandler,
       Downloader downloader, Cache cache, Stats stats) {
@@ -134,8 +136,12 @@ class Dispatcher {
     });
   }
 
-  void dispatchSubmit(Action action) {
-    handler.sendMessage(handler.obtainMessage(REQUEST_SUBMIT, action));
+  void dispatchSubmit(Action action, long delayMillis) {
+    if (delayMillis > 0) {
+      handler.sendMessageDelayed(handler.obtainMessage(REQUEST_SUBMIT, action), delayMillis);
+    } else {
+      handler.sendMessage(handler.obtainMessage(REQUEST_SUBMIT, action));
+    }
   }
 
   void dispatchCancel(Action action) {
@@ -147,7 +153,15 @@ class Dispatcher {
   }
 
   void dispatchResumeTag(Object tag) {
-    handler.sendMessage(handler.obtainMessage(TAG_RESUME, tag));
+    dispatchResumeTag(tag, 0);
+  }
+
+  void dispatchResumeTag(Object tag, long millis) {
+    if (millis > 0) {
+      handler.sendMessageDelayed(handler.obtainMessage(TAG_RESUME, tag), millis);
+    } else {
+      handler.sendMessage(handler.obtainMessage(TAG_RESUME, tag));
+    }
   }
 
   void dispatchComplete(BitmapHunter hunter) {
@@ -198,7 +212,8 @@ class Dispatcher {
       return;
     }
 
-    hunter = forRequest(action.getPicasso(), this, cache, stats, action);
+    hunter = forRequest(action.getPicasso(), this, action.request.cache, 
+      action.request.diskCache, stats, action);
     hunter.future = service.submit(hunter);
     hunterMap.put(action.getKey(), hunter);
     if (dismissFailed) {
@@ -367,7 +382,7 @@ class Dispatcher {
 
   void performComplete(BitmapHunter hunter) {
     if (shouldWriteToMemoryCache(hunter.getMemoryPolicy())) {
-      cache.set(hunter.getKey(), hunter.getResult());
+      hunter.cache.set(hunter.getKey(), hunter.getResult());
     }
     hunterMap.remove(hunter.getKey());
     batch(hunter);
@@ -447,9 +462,13 @@ class Dispatcher {
     if (hunter.isCancelled()) {
       return;
     }
-    batch.add(hunter);
-    if (!handler.hasMessages(HUNTER_DELAY_NEXT_BATCH)) {
-      handler.sendEmptyMessageDelayed(HUNTER_DELAY_NEXT_BATCH, BATCH_DELAY);
+    if (useBatch) {
+      batch.add(hunter);
+      if (!handler.hasMessages(HUNTER_DELAY_NEXT_BATCH)) {
+        handler.sendEmptyMessageDelayed(HUNTER_DELAY_NEXT_BATCH, BATCH_DELAY);
+      }
+    } else {
+      mainThreadHandler.sendMessage(mainThreadHandler.obtainMessage(REQUEST_COMPLETE, hunter));
     }
   }
 
