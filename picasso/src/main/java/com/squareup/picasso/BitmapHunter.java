@@ -19,6 +19,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.net.NetworkInfo;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
@@ -198,6 +199,9 @@ class BitmapHunter implements Runnable {
     }    
 
     if (shouldReadFromMemoryCache(memoryPolicy)) {
+      if (picasso.loggingEnabled) {
+        log(OWNER_HUNTER, VERB_EXECUTING, data.logId(), "cache: " + cache);
+      }
       bitmap = cache.get(key);
       if (bitmap != null) {
         stats.dispatchCacheHit();
@@ -210,6 +214,9 @@ class BitmapHunter implements Runnable {
     }
 
     if (diskCache != null) {
+      if (picasso.loggingEnabled) {
+        log(OWNER_HUNTER, VERB_EXECUTING, data.logId(), "diskCache: " + diskCache);
+      }
       bitmap = diskCache.get(key);
       if (null != bitmap) {
         stats.dispatchCacheHit();

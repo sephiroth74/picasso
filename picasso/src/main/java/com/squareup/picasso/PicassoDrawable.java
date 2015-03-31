@@ -28,6 +28,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.SystemClock;
+import android.util.Log;
 import android.widget.ImageView;
 
 import static android.graphics.Color.WHITE;
@@ -36,7 +37,6 @@ import static com.squareup.picasso.Picasso.LoadedFrom.MEMORY;
 final class PicassoDrawable extends BitmapDrawable {
   // Only accessed from main thread.
   private static final Paint DEBUG_PAINT = new Paint();
-  private static final float FADE_DURATION = 200f; //ms
 
   /**
    * Create or update the drawable on the target {@link ImageView} to display the supplied bitmap
@@ -58,6 +58,7 @@ final class PicassoDrawable extends BitmapDrawable {
    * placeholder image.
    */
   static void setPlaceholder(ImageView target, Drawable placeholderDrawable) {
+    Log.v(Picasso.TAG, "setPlaceHolder: " + placeholderDrawable);
     target.setImageDrawable(placeholderDrawable);
     if (target.getDrawable() instanceof AnimationDrawable) {
       ((AnimationDrawable) target.getDrawable()).start();

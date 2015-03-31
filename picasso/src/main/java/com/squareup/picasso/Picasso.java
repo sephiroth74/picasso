@@ -23,6 +23,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.os.Process;
+import android.util.Log;
 import android.widget.ImageView;
 import android.widget.RemoteViews;
 import java.io.File;
@@ -524,6 +525,9 @@ public class Picasso {
   }
 
   Bitmap quickMemoryCacheCheck(Cache cache, String key) {
+    if (isLoggingEnabled()) {
+      Log.v(TAG, "quickMemoryCacheCheck: " + cache);
+    }
     Bitmap cached = cache.get(key);
     if (cached != null) {
       stats.dispatchCacheHit();
@@ -898,7 +902,7 @@ public class Picasso {
     MEMORY(Color.GREEN),
     DISK(Color.BLUE),
     NETWORK(Color.RED),
-    DISK_CACHE(Color.BLUE);
+    DISK_CACHE(Color.YELLOW);
 
     final int debugColor;
 
