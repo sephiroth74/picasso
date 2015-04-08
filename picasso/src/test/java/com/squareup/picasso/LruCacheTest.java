@@ -26,6 +26,8 @@ import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
+import it.sephiroth.android.library.picasso.LruCache;
+
 import static android.graphics.Bitmap.Config.ALPHA_8;
 import static junit.framework.Assert.fail;
 import static org.fest.assertions.api.Assertions.assertThat;

@@ -2,6 +2,8 @@ package com.squareup.picasso;
 
 import org.junit.Test;
 
+import it.sephiroth.android.library.picasso.MemoryPolicy;
+
 import static org.fest.assertions.api.Assertions.assertThat;
 
 public class MemoryPolicyTest {

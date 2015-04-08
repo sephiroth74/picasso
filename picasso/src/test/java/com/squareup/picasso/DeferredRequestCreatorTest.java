@@ -25,6 +25,11 @@ import org.mockito.Captor;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
+import it.sephiroth.android.library.picasso.Callback;
+import it.sephiroth.android.library.picasso.Picasso;
+import it.sephiroth.android.library.picasso.Request;
+import it.sephiroth.android.library.picasso.RequestCreator;
+
 import static com.squareup.picasso.TestUtils.TRANSFORM_REQUEST_ANSWER;
 import static com.squareup.picasso.TestUtils.URI_1;
 import static com.squareup.picasso.TestUtils.mockCallback;

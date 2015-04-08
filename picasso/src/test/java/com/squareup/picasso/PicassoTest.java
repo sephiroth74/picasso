@@ -32,9 +32,16 @@ import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
+import it.sephiroth.android.library.picasso.Cache;
+import it.sephiroth.android.library.picasso.Downloader;
+import it.sephiroth.android.library.picasso.Picasso;
+import it.sephiroth.android.library.picasso.Request;
+import it.sephiroth.android.library.picasso.RequestHandler;
+import it.sephiroth.android.library.picasso.Target;
+
 import static android.graphics.Bitmap.Config.ARGB_8888;
-import static com.squareup.picasso.Picasso.Listener;
-import static com.squareup.picasso.Picasso.LoadedFrom.MEMORY;
+import static it.sephiroth.android.library.picasso.Picasso.Listener;
+import static it.sephiroth.android.library.picasso.Picasso.LoadedFrom.MEMORY;
 import static com.squareup.picasso.RemoteViewsAction.RemoteViewsTarget;
 import static com.squareup.picasso.TestUtils.URI_1;
 import static com.squareup.picasso.TestUtils.URI_KEY_1;
@@ -62,11 +69,14 @@ import static org.mockito.MockitoAnnotations.initMocks;
 public class PicassoTest {
 
   @Mock Context context;
-  @Mock Downloader downloader;
+  @Mock
+  Downloader downloader;
   @Mock Dispatcher dispatcher;
   @Mock Picasso.RequestTransformer transformer;
-  @Mock RequestHandler requestHandler;
-  @Mock Cache cache;
+  @Mock
+  RequestHandler requestHandler;
+  @Mock
+  Cache cache;
   @Mock Listener listener;
   @Mock Stats stats;
 

@@ -31,9 +31,14 @@ import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
+import it.sephiroth.android.library.picasso.Downloader;
+import it.sephiroth.android.library.picasso.MemoryPolicy;
+import it.sephiroth.android.library.picasso.NetworkPolicy;
+import it.sephiroth.android.library.picasso.UrlConnectionDownloader;
+
 import static android.os.Build.VERSION_CODES.GINGERBREAD;
 import static android.os.Build.VERSION_CODES.ICE_CREAM_SANDWICH;
-import static com.squareup.picasso.UrlConnectionDownloader.RESPONSE_SOURCE;
+import static it.sephiroth.android.library.picasso.UrlConnectionDownloader.RESPONSE_SOURCE;
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;

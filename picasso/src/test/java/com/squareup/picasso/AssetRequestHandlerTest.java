@@ -10,6 +10,8 @@ import org.mockito.Mock;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
+import it.sephiroth.android.library.picasso.Request;
+
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.mockito.MockitoAnnotations.initMocks;
 

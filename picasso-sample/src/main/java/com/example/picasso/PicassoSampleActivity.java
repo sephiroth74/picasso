@@ -10,7 +10,7 @@ import android.widget.FrameLayout;
 import android.widget.ListView;
 import android.widget.ToggleButton;
 
-import com.squareup.picasso.Picasso;
+import it.sephiroth.android.library.picasso.Picasso;
 
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;

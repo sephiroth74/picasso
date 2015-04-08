@@ -21,6 +21,11 @@ import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.mockwebserver.MockResponse;
 import com.squareup.okhttp.mockwebserver.RecordedRequest;
 import com.squareup.okhttp.mockwebserver.rule.MockWebServerRule;
+
+import it.sephiroth.android.library.picasso.Cache;
+import it.sephiroth.android.library.picasso.Downloader;
+import it.sephiroth.android.library.picasso.NetworkPolicy;
+import it.sephiroth.android.library.picasso.OkHttpDownloader;
 import okio.Okio;
 import org.junit.Before;
 import org.junit.Rule;

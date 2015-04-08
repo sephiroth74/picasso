@@ -33,13 +33,21 @@ import org.robolectric.annotation.Config;
 import org.robolectric.shadows.ShadowBitmap;
 import org.robolectric.shadows.ShadowMatrix;
 
+import it.sephiroth.android.library.picasso.Cache;
+import it.sephiroth.android.library.picasso.Downloader;
+import it.sephiroth.android.library.picasso.Picasso;
+import it.sephiroth.android.library.picasso.Request;
+import it.sephiroth.android.library.picasso.RequestHandler;
+import it.sephiroth.android.library.picasso.StatsSnapshot;
+import it.sephiroth.android.library.picasso.Transformation;
+
 import static android.graphics.Bitmap.Config.ARGB_8888;
 import static com.squareup.picasso.BitmapHunter.forRequest;
 import static com.squareup.picasso.BitmapHunter.transformResult;
-import static com.squareup.picasso.Picasso.LoadedFrom.MEMORY;
-import static com.squareup.picasso.Picasso.Priority.HIGH;
-import static com.squareup.picasso.Picasso.Priority.LOW;
-import static com.squareup.picasso.Picasso.Priority.NORMAL;
+import static it.sephiroth.android.library.picasso.Picasso.LoadedFrom.MEMORY;
+import static it.sephiroth.android.library.picasso.Picasso.Priority.HIGH;
+import static it.sephiroth.android.library.picasso.Picasso.Priority.LOW;
+import static it.sephiroth.android.library.picasso.Picasso.Priority.NORMAL;
 import static com.squareup.picasso.TestUtils.ASSET_KEY_1;
 import static com.squareup.picasso.TestUtils.ASSET_URI_1;
 import static com.squareup.picasso.TestUtils.CONTACT_KEY_1;
@@ -83,11 +91,14 @@ import static org.robolectric.Robolectric.shadowOf;
 public class BitmapHunterTest {
 
   @Mock Context context;
-  @Mock Picasso picasso;
-  @Mock Cache cache;
+  @Mock
+  Picasso picasso;
+  @Mock
+  Cache cache;
   @Mock Stats stats;
   @Mock Dispatcher dispatcher;
-  @Mock Downloader downloader;
+  @Mock
+  Downloader downloader;
 
   final Bitmap bitmap = makeBitmap();
 

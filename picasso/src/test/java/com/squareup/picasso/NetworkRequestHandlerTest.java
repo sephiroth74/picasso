@@ -28,6 +28,12 @@ import org.mockito.Mock;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
+import it.sephiroth.android.library.picasso.Cache;
+import it.sephiroth.android.library.picasso.Downloader;
+import it.sephiroth.android.library.picasso.NetworkPolicy;
+import it.sephiroth.android.library.picasso.Picasso;
+import it.sephiroth.android.library.picasso.RequestHandler;
+
 import static android.graphics.Bitmap.Config.ARGB_8888;
 import static com.squareup.picasso.TestUtils.URI_1;
 import static com.squareup.picasso.TestUtils.URI_KEY_1;
@@ -47,11 +53,14 @@ import static org.mockito.MockitoAnnotations.initMocks;
 @Config(manifest = Config.NONE)
 public class NetworkRequestHandlerTest {
 
-  @Mock Picasso picasso;
-  @Mock Cache cache;
+  @Mock
+  Picasso picasso;
+  @Mock
+  Cache cache;
   @Mock Stats stats;
   @Mock Dispatcher dispatcher;
-  @Mock Downloader downloader;
+  @Mock
+  Downloader downloader;
   NetworkRequestHandler networkHandler;
 
   @Before public void setUp() throws Exception {

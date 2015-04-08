@@ -17,6 +17,8 @@ package com.squareup.picasso;
 
 import android.graphics.Bitmap;
 
+import it.sephiroth.android.library.picasso.Transformation;
+
 class TestTransformation implements Transformation {
   private final String key;
   private final Bitmap result;

@@ -34,12 +34,22 @@ import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
+import it.sephiroth.android.library.picasso.Cache;
+import it.sephiroth.android.library.picasso.Callback;
+import it.sephiroth.android.library.picasso.MemoryPolicy;
+import it.sephiroth.android.library.picasso.NetworkPolicy;
+import it.sephiroth.android.library.picasso.Picasso;
+import it.sephiroth.android.library.picasso.Request;
+import it.sephiroth.android.library.picasso.RequestCreator;
+import it.sephiroth.android.library.picasso.Target;
+import it.sephiroth.android.library.picasso.Transformation;
+
 import static android.graphics.Bitmap.Config.ARGB_8888;
-import static com.squareup.picasso.Picasso.LoadedFrom.MEMORY;
-import static com.squareup.picasso.Picasso.Priority.HIGH;
-import static com.squareup.picasso.Picasso.Priority.LOW;
-import static com.squareup.picasso.Picasso.Priority.NORMAL;
-import static com.squareup.picasso.Picasso.RequestTransformer.IDENTITY;
+import static it.sephiroth.android.library.picasso.Picasso.LoadedFrom.MEMORY;
+import static it.sephiroth.android.library.picasso.Picasso.Priority.HIGH;
+import static it.sephiroth.android.library.picasso.Picasso.Priority.LOW;
+import static it.sephiroth.android.library.picasso.Picasso.Priority.NORMAL;
+import static it.sephiroth.android.library.picasso.Picasso.RequestTransformer.IDENTITY;
 import static com.squareup.picasso.RemoteViewsAction.AppWidgetAction;
 import static com.squareup.picasso.RemoteViewsAction.NotificationAction;
 import static com.squareup.picasso.TestUtils.STABLE_1;
@@ -74,7 +84,8 @@ import static org.mockito.MockitoAnnotations.initMocks;
 @Config(manifest = Config.NONE)
 public class RequestCreatorTest {
 
-  @Mock Picasso picasso;
+  @Mock
+  Picasso picasso;
   @Captor ArgumentCaptor<Action> actionCaptor;
 
   final Bitmap bitmap = makeBitmap();

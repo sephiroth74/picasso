@@ -39,7 +39,7 @@ import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 import static android.net.ConnectivityManager.CONNECTIVITY_ACTION;
 import static com.squareup.picasso.Dispatcher.NetworkBroadcastReceiver;
 import static com.squareup.picasso.Dispatcher.NetworkBroadcastReceiver.EXTRA_AIRPLANE_STATE;
-import static com.squareup.picasso.Picasso.LoadedFrom.MEMORY;
+import static it.sephiroth.android.library.picasso.Picasso.LoadedFrom.MEMORY;
 import static com.squareup.picasso.TestUtils.URI_1;
 import static com.squareup.picasso.TestUtils.URI_2;
 import static com.squareup.picasso.TestUtils.URI_KEY_1;

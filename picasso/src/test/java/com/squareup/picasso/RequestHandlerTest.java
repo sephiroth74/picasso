@@ -22,10 +22,12 @@ import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
+import it.sephiroth.android.library.picasso.Request;
+
 import static android.graphics.Bitmap.Config.RGB_565;
-import static com.squareup.picasso.RequestHandler.calculateInSampleSize;
-import static com.squareup.picasso.RequestHandler.createBitmapOptions;
-import static com.squareup.picasso.RequestHandler.requiresInSampleSize;
+import static it.sephiroth.android.library.picasso.RequestHandler.calculateInSampleSize;
+import static it.sephiroth.android.library.picasso.RequestHandler.createBitmapOptions;
+import static it.sephiroth.android.library.picasso.RequestHandler.requiresInSampleSize;
 import static com.squareup.picasso.TestUtils.URI_1;
 import static org.fest.assertions.api.Assertions.assertThat;
 

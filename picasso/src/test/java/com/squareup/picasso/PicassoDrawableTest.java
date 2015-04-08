@@ -26,8 +26,8 @@ import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
 import static android.graphics.Color.RED;
-import static com.squareup.picasso.Picasso.LoadedFrom.DISK;
-import static com.squareup.picasso.Picasso.LoadedFrom.MEMORY;
+import static it.sephiroth.android.library.picasso.Picasso.LoadedFrom.DISK;
+import static it.sephiroth.android.library.picasso.Picasso.LoadedFrom.MEMORY;
 import static com.squareup.picasso.TestUtils.makeBitmap;
 import static org.fest.assertions.api.Assertions.assertThat;
 

@@ -11,6 +11,8 @@ import org.mockito.Mock;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
+import it.sephiroth.android.library.picasso.Request;
+
 import static android.graphics.Bitmap.Config.ARGB_8888;
 import static com.squareup.picasso.MediaStoreRequestHandler.PicassoKind.FULL;
 import static com.squareup.picasso.MediaStoreRequestHandler.PicassoKind.MICRO;
