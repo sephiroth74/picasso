@@ -21,16 +21,16 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RemoteViews;
+
+import org.jetbrains.annotations.TestOnly;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
-import org.jetbrains.annotations.TestOnly;
 
 import static it.sephiroth.android.library.picasso.BitmapHunter.forRequest;
 import static it.sephiroth.android.library.picasso.MemoryPolicy.NO_CACHE;
@@ -42,8 +42,6 @@ import static it.sephiroth.android.library.picasso.PicassoDrawable.setBitmap;
 import static it.sephiroth.android.library.picasso.PicassoDrawable.setPlaceholder;
 import static it.sephiroth.android.library.picasso.RemoteViewsAction.AppWidgetAction;
 import static it.sephiroth.android.library.picasso.RemoteViewsAction.NotificationAction;
-import static it.sephiroth.android.library.picasso.Utils.createKey;
-import static it.sephiroth.android.library.picasso.Utils.log;
 
 /** Fluent API for building an image download request. */
 @SuppressWarnings("UnusedDeclaration") // Public API.

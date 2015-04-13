@@ -29,9 +29,6 @@ import java.util.List;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static it.sephiroth.android.library.picasso.Utils.getLogIdsForHunter;
-import static it.sephiroth.android.library.picasso.Utils.log;
-
 class BitmapHunter implements Runnable {
   /**
    * Global lock for bitmap decoding to ensure that we are only are decoding one at a time. Since
@@ -186,7 +183,7 @@ class BitmapHunter implements Runnable {
 
     if (isCancelled()) {
       return null;
-    }    
+    }
 
     if (MemoryPolicy.shouldReadFromMemoryCache(memoryPolicy)) {
       if (picasso.loggingEnabled) {

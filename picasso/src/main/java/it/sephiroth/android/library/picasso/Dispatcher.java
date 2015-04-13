@@ -26,7 +26,6 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
-import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -43,8 +42,6 @@ import static android.content.Intent.ACTION_AIRPLANE_MODE_CHANGED;
 import static android.net.ConnectivityManager.CONNECTIVITY_ACTION;
 import static android.os.Process.THREAD_PRIORITY_BACKGROUND;
 import static it.sephiroth.android.library.picasso.BitmapHunter.forRequest;
-import static it.sephiroth.android.library.picasso.Utils.getLogIdsForHunter;
-import static it.sephiroth.android.library.picasso.Utils.log;
 
 class Dispatcher {
   private static final int RETRY_DELAY = 500;
