@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.squareup.picasso;
+package it.sephiroth.android.library.picasso;
 
 import android.content.res.Resources;
 import java.io.ByteArrayInputStream;
@@ -23,17 +23,14 @@ import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
-import it.sephiroth.android.library.picasso.Request;
-import it.sephiroth.android.library.picasso.Transformation;
-
-import static com.squareup.picasso.TestUtils.RESOURCE_ID_1;
-import static com.squareup.picasso.TestUtils.RESOURCE_ID_URI;
-import static com.squareup.picasso.TestUtils.RESOURCE_TYPE_URI;
-import static com.squareup.picasso.TestUtils.URI_1;
-import static com.squareup.picasso.TestUtils.mockPackageResourceContext;
-import static com.squareup.picasso.Utils.createKey;
-import static com.squareup.picasso.Utils.isWebPFile;
-import static com.squareup.picasso.Utils.parseResponseSourceHeader;
+import static it.sephiroth.android.library.picasso.TestUtils.RESOURCE_ID_1;
+import static it.sephiroth.android.library.picasso.TestUtils.RESOURCE_ID_URI;
+import static it.sephiroth.android.library.picasso.TestUtils.RESOURCE_TYPE_URI;
+import static it.sephiroth.android.library.picasso.TestUtils.URI_1;
+import static it.sephiroth.android.library.picasso.TestUtils.mockPackageResourceContext;
+import static it.sephiroth.android.library.picasso.Utils.createKey;
+import static it.sephiroth.android.library.picasso.Utils.isWebPFile;
+import static it.sephiroth.android.library.picasso.Utils.parseResponseSourceHeader;
 import static org.fest.assertions.api.Assertions.assertThat;
 
 @RunWith(RobolectricTestRunner.class)

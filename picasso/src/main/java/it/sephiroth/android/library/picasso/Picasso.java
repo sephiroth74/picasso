@@ -26,6 +26,7 @@ import android.os.Process;
 import android.util.Log;
 import android.widget.ImageView;
 import android.widget.RemoteViews;
+
 import java.io.File;
 import java.lang.ref.ReferenceQueue;
 import java.util.ArrayList;
@@ -43,7 +44,6 @@ import static it.sephiroth.android.library.picasso.Dispatcher.REQUEST_COMPLETE;
 import static it.sephiroth.android.library.picasso.Dispatcher.REQUEST_GCED;
 import static it.sephiroth.android.library.picasso.MemoryPolicy.shouldReadFromMemoryCache;
 import static it.sephiroth.android.library.picasso.Picasso.LoadedFrom.MEMORY;
-import static it.sephiroth.android.library.picasso.Utils.log;
 
 /**
  * Image downloading, transformation, and caching manager.
@@ -506,6 +506,11 @@ public class Picasso {
     targetToDeferredRequestCreator.put(view, request);
   }
 
+  @Deprecated
+  void enqueueAndSubmit(Action action) {
+    enqueueAndSubmit(action, 0);
+  }
+
   void enqueueAndSubmit(Action action, long delayMillis) {
     Object target = action.getTarget();
     if (target != null && targetToAction.get(target) != action) {
@@ -516,8 +521,18 @@ public class Picasso {
     submit(action, delayMillis);
   }
 
+  @Deprecated
+  void submit(Action action) {
+    submit(action, 0);
+  }
+
   void submit(Action action, long delayMillis) {
     dispatcher.dispatchSubmit(action, delayMillis);
+  }
+
+  @Deprecated
+  Bitmap quickMemoryCacheCheck(String key) {
+    return quickMemoryCacheCheck(cache, key);
   }
 
   Bitmap quickMemoryCacheCheck(Cache cache, String key) {
@@ -569,7 +584,7 @@ public class Picasso {
   void resumeAction(Action action) {
     Bitmap bitmap = null;
     if (shouldReadFromMemoryCache(action.memoryPolicy)) {
-      bitmap = quickMemoryCacheCheck(action.request.cache, action.getKey());
+      bitmap = quickMemoryCacheCheck(null != action.request ? action.request.cache : cache, action.getKey());
     }
 
     if (bitmap != null) {

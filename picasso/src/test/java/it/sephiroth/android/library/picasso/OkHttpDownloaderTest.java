@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.squareup.picasso;
+package it.sephiroth.android.library.picasso;
 
 import android.net.Uri;
 import com.squareup.okhttp.Cache;
@@ -22,7 +22,6 @@ import com.squareup.okhttp.mockwebserver.MockResponse;
 import com.squareup.okhttp.mockwebserver.RecordedRequest;
 import com.squareup.okhttp.mockwebserver.rule.MockWebServerRule;
 
-import it.sephiroth.android.library.picasso.Cache;
 import it.sephiroth.android.library.picasso.Downloader;
 import it.sephiroth.android.library.picasso.NetworkPolicy;
 import it.sephiroth.android.library.picasso.OkHttpDownloader;

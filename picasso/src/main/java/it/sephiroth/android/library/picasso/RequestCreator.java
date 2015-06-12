@@ -84,7 +84,7 @@ public class RequestCreator {
   @TestOnly RequestCreator() {
     this.picasso = null;
     this.data = new Request.Builder(null, 0, null);
-    this.data.setCache(picasso.getCache());
+    this.data.setCache(null);
   }
 
   /**

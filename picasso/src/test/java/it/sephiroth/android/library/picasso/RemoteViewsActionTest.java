@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.squareup.picasso;
+package it.sephiroth.android.library.picasso;
 
 import android.graphics.Bitmap;
 import android.widget.RemoteViews;
@@ -24,15 +24,10 @@ import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
-import it.sephiroth.android.library.picasso.Cache;
-import it.sephiroth.android.library.picasso.Picasso;
-import it.sephiroth.android.library.picasso.Request;
-
 import static android.graphics.Bitmap.Config.ARGB_8888;
 import static it.sephiroth.android.library.picasso.Picasso.LoadedFrom.NETWORK;
 import static it.sephiroth.android.library.picasso.Picasso.RequestTransformer.IDENTITY;
-import static com.squareup.picasso.TestUtils.URI_KEY_1;
-import static com.squareup.picasso.TestUtils.makeBitmap;
+import static it.sephiroth.android.library.picasso.TestUtils.makeBitmap;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
@@ -52,7 +47,7 @@ public class RemoteViewsActionTest {
   }
 
   @Test public void completeSetsBitmapOnRemoteViews() throws Exception {
-    Bitmap bitmap = makeBitmap();
+    Bitmap bitmap = TestUtils.makeBitmap();
     RemoteViewsAction action = createAction();
     action.complete(bitmap, NETWORK);
     verify(remoteViews).setImageViewBitmap(1, bitmap);
@@ -76,7 +71,7 @@ public class RemoteViewsActionTest {
 
   private TestableRemoteViewsAction createAction(int errorResId) {
     return new TestableRemoteViewsAction(picasso, null, remoteViews, 1, errorResId, 0, 0, null,
-        URI_KEY_1);
+        TestUtils.URI_KEY_1);
   }
 
   private Picasso createPicasso() {

@@ -13,7 +13,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package com.squareup.picasso;
+package it.sephiroth.android.library.picasso;
 
 import android.app.Notification;
 import android.content.Context;
@@ -45,7 +45,7 @@ import static android.provider.ContactsContract.Contacts.CONTENT_URI;
 import static android.provider.ContactsContract.Contacts.Photo.CONTENT_DIRECTORY;
 import static it.sephiroth.android.library.picasso.Picasso.LoadedFrom.MEMORY;
 import static it.sephiroth.android.library.picasso.Picasso.Priority;
-import static com.squareup.picasso.Utils.createKey;
+import static it.sephiroth.android.library.picasso.Utils.createKey;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.doReturn;

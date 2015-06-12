@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.squareup.picasso;
+package it.sephiroth.android.library.picasso;
 
 import android.content.Context;
 import android.content.res.Resources;
@@ -24,17 +24,10 @@ import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
-import it.sephiroth.android.library.picasso.Cache;
-import it.sephiroth.android.library.picasso.Picasso;
-import it.sephiroth.android.library.picasso.Target;
-
 import static android.graphics.Bitmap.Config.ARGB_8888;
 import static it.sephiroth.android.library.picasso.Picasso.LoadedFrom.MEMORY;
 import static it.sephiroth.android.library.picasso.Picasso.RequestTransformer.IDENTITY;
-import static com.squareup.picasso.TestUtils.RESOURCE_ID_1;
-import static com.squareup.picasso.TestUtils.URI_KEY_1;
-import static com.squareup.picasso.TestUtils.makeBitmap;
-import static com.squareup.picasso.TestUtils.mockTarget;
+import static it.sephiroth.android.library.picasso.TestUtils.makeBitmap;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -47,16 +40,16 @@ public class TargetActionTest {
   @Test(expected = AssertionError.class)
   public void throwsErrorWithNullResult() throws Exception {
     TargetAction request =
-        new TargetAction(mock(Picasso.class), mockTarget(), null, 0, 0, null, URI_KEY_1, null, 0);
+        new TargetAction(mock(Picasso.class), TestUtils.mockTarget(), null, 0, 0, null, TestUtils.URI_KEY_1, null, 0, 0);
     request.complete(null, MEMORY);
   }
 
   @Test
   public void invokesSuccessIfTargetIsNotNull() throws Exception {
-    Bitmap bitmap = makeBitmap();
-    Target target = mockTarget();
+    Bitmap bitmap = TestUtils.makeBitmap();
+    Target target = TestUtils.mockTarget();
     TargetAction request =
-        new TargetAction(mock(Picasso.class), target, null, 0, 0, null, URI_KEY_1, null, 0);
+        new TargetAction(mock(Picasso.class), target, null, 0, 0, null, TestUtils.URI_KEY_1, null, 0, 0);
     request.complete(bitmap, MEMORY);
     verify(target).onBitmapLoaded(bitmap, MEMORY);
   }
@@ -64,10 +57,10 @@ public class TargetActionTest {
   @Test
   public void invokesOnBitmapFailedIfTargetIsNotNullWithErrorDrawable() throws Exception {
     Drawable errorDrawable = mock(Drawable.class);
-    Target target = mockTarget();
+    Target target = TestUtils.mockTarget();
     TargetAction request =
-        new TargetAction(mock(Picasso.class), target, null, 0, 0, errorDrawable, URI_KEY_1, null,
-            0);
+        new TargetAction(mock(Picasso.class), target, null, 0, 0, errorDrawable, TestUtils.URI_KEY_1, null,
+            0, 0);
     request.error();
     verify(target).onBitmapFailed(errorDrawable);
   }
@@ -75,17 +68,17 @@ public class TargetActionTest {
   @Test
   public void invokesOnBitmapFailedIfTargetIsNotNullWithErrorResourceId() throws Exception {
     Drawable errorDrawable = mock(Drawable.class);
-    Target target = mockTarget();
+    Target target = TestUtils.mockTarget();
     Context context = mock(Context.class);
     Picasso picasso =
         new Picasso(context, mock(Dispatcher.class), Cache.NONE, null, IDENTITY, null,
             mock(Stats.class), ARGB_8888, false, false);
     Resources res = mock(Resources.class);
     TargetAction request =
-        new TargetAction(picasso, target, null, 0, 0, null, URI_KEY_1, null, RESOURCE_ID_1);
+        new TargetAction(picasso, target, null, 0, 0, null, TestUtils.URI_KEY_1, null, TestUtils.RESOURCE_ID_1, 0);
 
     when(context.getResources()).thenReturn(res);
-    when(res.getDrawable(RESOURCE_ID_1)).thenReturn(errorDrawable);
+    when(res.getDrawable(TestUtils.RESOURCE_ID_1)).thenReturn(errorDrawable);
     request.error();
     verify(target).onBitmapFailed(errorDrawable);
   }
@@ -106,8 +99,8 @@ public class TargetActionTest {
     };
     Picasso picasso = mock(Picasso.class);
 
-    Bitmap bitmap = makeBitmap();
-    TargetAction tr = new TargetAction(picasso, bad, null, 0, 0, null, URI_KEY_1, null, 0);
+    Bitmap bitmap = TestUtils.makeBitmap();
+    TargetAction tr = new TargetAction(picasso, bad, null, 0, 0, null, TestUtils.URI_KEY_1, null, 0, 0);
     try {
       tr.complete(bitmap, MEMORY);
       fail();

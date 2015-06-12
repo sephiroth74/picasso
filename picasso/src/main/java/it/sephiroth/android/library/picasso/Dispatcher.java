@@ -127,6 +127,11 @@ class Dispatcher {
     });
   }
 
+  @Deprecated
+  void dispatchSubmit(Action action) {
+    dispatchSubmit(action, 0);
+  }
+
   void dispatchSubmit(Action action, long delayMillis) {
     if (delayMillis > 0) {
       handler.sendMessageDelayed(handler.obtainMessage(REQUEST_SUBMIT, action), delayMillis);

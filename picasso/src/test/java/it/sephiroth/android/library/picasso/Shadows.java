@@ -1,4 +1,4 @@
-package com.squareup.picasso;
+package it.sephiroth.android.library.picasso;
 
 import android.content.ContentResolver;
 import android.graphics.Bitmap;
@@ -7,7 +7,7 @@ import android.provider.MediaStore;
 import org.robolectric.annotation.Implementation;
 import org.robolectric.annotation.Implements;
 
-import static com.squareup.picasso.TestUtils.makeBitmap;
+import static it.sephiroth.android.library.picasso.TestUtils.makeBitmap;
 
 final class Shadows {
 
@@ -17,7 +17,7 @@ final class Shadows {
     @Implementation
     public static Bitmap getThumbnail(ContentResolver cr, long origId, int kind,
         BitmapFactory.Options options) {
-      return makeBitmap();
+      return TestUtils.makeBitmap();
     }
   }
 
@@ -27,7 +27,7 @@ final class Shadows {
     @Implementation
     public static Bitmap getThumbnail(ContentResolver cr, long origId, int kind,
         BitmapFactory.Options options) {
-      return makeBitmap(20, 20);
+      return TestUtils.makeBitmap(20, 20);
     }
   }
 }

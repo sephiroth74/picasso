@@ -1,4 +1,4 @@
-package com.squareup.picasso;
+package it.sephiroth.android.library.picasso;
 
 import org.junit.Test;
 
