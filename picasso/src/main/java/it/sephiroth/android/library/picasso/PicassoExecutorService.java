@@ -18,6 +18,7 @@ package it.sephiroth.android.library.picasso;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.telephony.TelephonyManager;
+import android.util.Log;
 
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
@@ -32,11 +33,12 @@ import java.util.concurrent.TimeUnit;
  * instance.
  */
 class PicassoExecutorService extends ThreadPoolExecutor {
-  private static final int DEFAULT_THREAD_COUNT = 3;
+  private static final int DEFAULT_THREAD_COUNT = Runtime.getRuntime().availableProcessors() * 2;
 
   PicassoExecutorService() {
     super(DEFAULT_THREAD_COUNT, DEFAULT_THREAD_COUNT, 0, TimeUnit.MILLISECONDS,
         new PriorityBlockingQueue<Runnable>(), new Utils.PicassoThreadFactory());
+    Log.d(Picasso.TAG, "default thread count: " + DEFAULT_THREAD_COUNT);
   }
 
   void adjustThreadCount(NetworkInfo info) {
@@ -48,7 +50,7 @@ class PicassoExecutorService extends ThreadPoolExecutor {
       case ConnectivityManager.TYPE_WIFI:
       case ConnectivityManager.TYPE_WIMAX:
       case ConnectivityManager.TYPE_ETHERNET:
-        setThreadCount(4);
+        setThreadCount(DEFAULT_THREAD_COUNT);
         break;
       case ConnectivityManager.TYPE_MOBILE:
         switch (info.getSubtype()) {
@@ -80,6 +82,7 @@ class PicassoExecutorService extends ThreadPoolExecutor {
   private void setThreadCount(int threadCount) {
     setCorePoolSize(threadCount);
     setMaximumPoolSize(threadCount);
+    Log.v(Picasso.TAG, "setThreadCount: " + threadCount);
   }
 
   @Override

@@ -110,7 +110,7 @@ final class MarkableInputStream extends InputStream {
 
   /** Resets the stream to the position recorded by {@code token}. */
   public void reset(long token) throws IOException {
-    Log.d("MarkableInputStream", "reset {offset:" + offset + ", limit:" + limit + ", token:" + token + ", reset:" + reset + "}");
+    //Log.d("MarkableInputStream", "reset {offset:" + offset + ", limit:" + limit + ", token:" + token + ", reset:" + reset + "}");
     if (offset > limit || token < reset) {
       throw new IOException("Cannot reset");
     }
