@@ -571,6 +571,10 @@ public class RequestCreator {
    * image is loaded use {@link #into(android.widget.ImageView, Callback)}.
    */
   public void into(Target target) {
+    into(target, null);
+  }
+
+  public void into(Target target, Callback callback) {
     long started = System.nanoTime();
     Utils.checkMain();
 
@@ -595,6 +599,9 @@ public class RequestCreator {
       if (bitmap != null) {
         picasso.cancelRequest(target);
         target.onBitmapLoaded(bitmap, MEMORY);
+        if (null != callback) {
+          callback.onSuccess();
+        }
         return;
       }
     }
@@ -603,7 +610,7 @@ public class RequestCreator {
 
     Action action =
         new TargetAction(picasso, target, request, memoryPolicy, networkPolicy, errorDrawable,
-            requestKey, tag, errorResId, fadeTime);
+            requestKey, tag, errorResId, fadeTime, callback);
     picasso.enqueueAndSubmit(action, delayMillis);
   }
 

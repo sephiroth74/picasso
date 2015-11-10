@@ -20,10 +20,13 @@ import android.graphics.drawable.Drawable;
 
 final class TargetAction extends Action<Target> {
 
+  Callback callback;
+
   TargetAction(Picasso picasso, Target target, Request data, int memoryPolicy, int networkPolicy,
-      Drawable errorDrawable, String key, Object tag, int errorResId, long fadeTime) {
+      Drawable errorDrawable, String key, Object tag, int errorResId, long fadeTime, Callback callback) {
     super(picasso, target, data, memoryPolicy, networkPolicy, errorResId, errorDrawable, key, tag,
         fadeTime);
+    this.callback = callback;
   }
 
   @Override void complete(Bitmap result, Picasso.LoadedFrom from) {
@@ -38,6 +41,10 @@ final class TargetAction extends Action<Target> {
         throw new IllegalStateException("Target callback must not recycle bitmap!");
       }
     }
+
+    if (callback != null) {
+      callback.onSuccess();
+    }
   }
 
   @Override void error() {
@@ -48,6 +55,18 @@ final class TargetAction extends Action<Target> {
       } else {
         target.onBitmapFailed(errorDrawable);
       }
+    }
+
+    if (callback != null) {
+      callback.onError();
+    }
+  }
+
+  @Override
+  void cancel() {
+    super.cancel();
+    if (callback != null) {
+      callback = null;
     }
   }
 }

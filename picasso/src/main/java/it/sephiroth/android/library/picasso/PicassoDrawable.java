@@ -34,9 +34,17 @@ import android.widget.ImageView;
 import static android.graphics.Color.WHITE;
 import static it.sephiroth.android.library.picasso.Picasso.LoadedFrom.MEMORY;
 
-final class PicassoDrawable extends BitmapDrawable {
+public final class PicassoDrawable extends BitmapDrawable {
   // Only accessed from main thread.
   private static final Paint DEBUG_PAINT = new Paint();
+
+  /**
+   * Create a new PicassoDrawable
+   */
+  public static PicassoDrawable create(final Context context, final Bitmap bitmap, 
+    final Picasso.LoadedFrom loadedFrom, long fadeTime) {
+    return new PicassoDrawable(context, bitmap, null, loadedFrom, fadeTime, false);
+  }
 
   /**
    * Create or update the drawable on the target {@link ImageView} to display the supplied bitmap

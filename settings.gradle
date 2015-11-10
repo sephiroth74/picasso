@@ -1,2 +1,4 @@
 include ':picasso'
 include ':picasso-sample'
+
+rootProject.name = "picasso-root"

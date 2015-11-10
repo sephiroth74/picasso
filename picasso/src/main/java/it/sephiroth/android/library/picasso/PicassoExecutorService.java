@@ -33,7 +33,7 @@ import java.util.concurrent.TimeUnit;
  * instance.
  */
 class PicassoExecutorService extends ThreadPoolExecutor {
-  private static final int DEFAULT_THREAD_COUNT = Runtime.getRuntime().availableProcessors() * 2;
+  private static final int DEFAULT_THREAD_COUNT = Math.max(Math.min(Runtime.getRuntime().availableProcessors() * 2, 8), 4);
 
   PicassoExecutorService() {
     super(DEFAULT_THREAD_COUNT, DEFAULT_THREAD_COUNT, 0, TimeUnit.MILLISECONDS,
