@@ -74,10 +74,7 @@ public class OkHttpDownloader implements Downloader {
    */
   public OkHttpDownloader(final File cacheDir, final long maxSize) {
     this(defaultOkHttpClient());
-    try {
-      client.setCache(new com.squareup.okhttp.Cache(cacheDir, maxSize));
-    } catch (IOException ignored) {
-    }
+    client.setCache(new com.squareup.okhttp.Cache(cacheDir, maxSize));
   }
 
   /**

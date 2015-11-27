@@ -7,15 +7,9 @@ version VERSION_NAME
 
 
 dependencies {
-    compile 'com.squareup.okhttp:okhttp:2.1.0'
-    compile 'com.squareup.okhttp:okhttp-urlconnection:2.1.0'
+    compile 'com.squareup.okhttp:okhttp:2.5.0'
+    compile 'com.squareup.okhttp:okhttp-urlconnection:2.5.0'
     compile 'com.intellij:annotations:12.0'
-    //testCompile 'junit:junit:4.+'
-    //testCompile "org.mockito:mockito-core:+"
-    //testCompile 'org.robolectric:robolectric:2.+'
-    //testCompile 'com.squareup:fest-android:1.0.0'
-    //testCompile 'com.squareup.okhttp:mockwebserver:+'
-    //testCompile 'com.android.support:support-v4:22.2.0'
 }
 
 
@@ -25,7 +19,7 @@ android {
 
 
     defaultConfig {
-        minSdkVersion 9
+        minSdkVersion 16
         targetSdkVersion Integer.parseInt(ANDROID_BUILD_TARGET_SDK_VERSION)
         versionCode 1
         versionName version
@@ -35,13 +29,8 @@ android {
     buildTypes {
         release {
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
         }
     }
-
-    //testOptions {
-    //    unitTests.returnDefaultValues = true
-    //}
 }
 
 
